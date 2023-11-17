@@ -30,8 +30,7 @@ const themeConfig = {
       },
     },
     typography: {
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      // You can add a digital font here for specific elements if you wish
+      fontFamily: '"Orbitron", "Roboto", "Helvetica", "Arial", sans-serif',
     },
     components: {
       // Apply global styles for Navbar and Footer

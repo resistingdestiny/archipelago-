@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider } from "util/theme";
-import Navbar2 from "components/Navbar2";
+import Navbar2 from "components/Navbar";
 import Footer from "components/Footer";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
@@ -9,6 +9,7 @@ import { goerli, mainnet, polygon, sepolia } from "wagmi/chains";
 import { scroll, mantle } from "../util/customChains"
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { Helmet } from 'react-helmet'
 
 
 const { chains, provider } = configureChains(
@@ -45,6 +46,9 @@ function MyApp({ Component, serverEmotionCache, pageProps }) {
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}>
           <ThemeProvider serverEmotionCache={serverEmotionCache}>
+          <Helmet>
+            <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+          </Helmet>
           <Navbar2
             logo="logo.png"
             logoInverted="logo.png"
@@ -54,7 +58,7 @@ function MyApp({ Component, serverEmotionCache, pageProps }) {
             size="medium"
             bgImage=""
             bgImageOpacity={1}
-            copyright={`© ${new Date().getFullYear()} Cat Exchange`}
+            copyright={`© ${new Date().getFullYear()} Archipelago`}
             logo="logo.png"
             logoInverted="logo.png"
             sticky={false}

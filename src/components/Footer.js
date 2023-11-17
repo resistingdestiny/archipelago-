@@ -3,10 +3,8 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Link from "next/link";
 import Typography from "@mui/material/Typography";
-import MuiLink from "@mui/material/Link";
 import TwitterIcon from "@mui/icons-material/Twitter";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
+
 import Section from "components/Section";
 import { useTheme } from "@mui/styles";
 
@@ -69,16 +67,13 @@ function Footer(props) {
     >
       <Container sx={{ display: "flex", flexWrap: "wrap" }}>
         <Box sx={[styles.item, styles.leftItem]}>
-          <Link href="/">
-            <a>
-              <Box
-                component="img"
-                src={logo}
-                alt="Logo"
-                sx={{ display: "block", height: "32px" }}
-              />
-            </a>
-          </Link>
+        <Link href="/" passHref>
+              <a style={{ color: "inherit", textDecoration: "none" }}>
+                <Typography variant="h6" color="inherit">
+                  Archipelago
+                </Typography>
+              </a>
+            </Link>
         </Box>
         <Box
           sx={[

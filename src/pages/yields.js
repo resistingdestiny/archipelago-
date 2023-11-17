@@ -14,6 +14,7 @@ import {
   CardContent,
   LinearProgress,
   Chip,
+  Button,
   Avatar,
 } from '@mui/material';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
@@ -122,12 +123,12 @@ const useStyles = makeStyles((theme) => ({
     textShadow: '0 0 5px #9c27b0, 0 0 15px #9c27b0, 0 0 30px #9c27b0, 0 0 60px #9c27b0',
   },
   button: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(2),
     borderColor: '#9c27b0',
     color: '#9c27b0',
-    '&:hover': {
-      backgroundColor: '#9c27b0',
-      color: '#fff',
-    },
+  
   },
   formControl: {
     minWidth: 120,
@@ -193,7 +194,7 @@ function DashboardPage(props) {
   };
 
   const filterProducts = (strategy, asset, sortBy) => {
-    // Implement your filtering logic here based on the selected options
+   
     let filtered = allProducts;
     if (strategy) {
       filtered = filtered.filter(product => product.strategy === strategy);
@@ -201,9 +202,9 @@ function DashboardPage(props) {
     if (asset) {
       filtered = filtered.filter(product => product.asset === asset);
     }
-    // Add sorting logic if needed
 
-    setProducts(filtered); // Update the products state with the filtered array
+
+    setProducts(filtered); 
   };
 
   return (
@@ -217,7 +218,7 @@ function DashboardPage(props) {
             onChange={(e) => setStrategy(e.target.value)}
             label="Strategy"
           >
-            {/* Map through strategies and return MenuItems */}
+           
             <MenuItem value="Strategy1">Strategy 1</MenuItem>
             <MenuItem value="Strategy2">Strategy 2</MenuItem>
             {/* ... other strategies */}
@@ -231,7 +232,7 @@ function DashboardPage(props) {
             onChange={(e) => setAsset(e.target.value)}
             label="Deposit Asset"
           >
-            {/* Map through assets and return MenuItems */}
+          
             <MenuItem value="Asset1">Asset 1</MenuItem>
             <MenuItem value="Asset2">Asset 2</MenuItem>
             {/* ... other assets */}
@@ -245,10 +246,10 @@ function DashboardPage(props) {
             onChange={(e) => setSortBy(e.target.value)}
             label="Sort By"
           >
-            {/* Map through sort options and return MenuItems */}
+      
             <MenuItem value="HighestYield">Highest Yield</MenuItem>
             <MenuItem value="LowestRisk">Lowest Risk</MenuItem>
-            {/* ... other sort options */}
+           
           </Select>
         </FormControl>
 
@@ -288,6 +289,15 @@ function DashboardPage(props) {
               avatar={<Avatar className={classes.avatar}>{/* tag icon */}</Avatar>}
             />
           ))}
+        </Box>
+        <Box mt={2} className={classes.button}> 
+          <Button
+            variant="contained" 
+            className={classes.ctaButton}
+            href="/pool"
+          >
+            Get Started
+          </Button>
         </Box>
       </CardContent>
     </Card>

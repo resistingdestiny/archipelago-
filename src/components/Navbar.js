@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 
 import MenuIcon from "@mui/icons-material/Menu";
+import Typography from "@mui/material/Typography";
 
 import Section from "components/Section";
 import { useTheme } from "@mui/styles";
@@ -35,14 +36,11 @@ function Navbar2(props) {
       <AppBar position="static" color="transparent" elevation={0}>
         <Container disableGutters={true}>
           <Toolbar>
-            <Link href="/">
-              <a>
-                <Box
-                  component="img"
-                  src={logo}
-                  alt="Logo"
-                  sx={{ height: 28 }}
-                />
+          <Link href="/" passHref>
+              <a style={{ color: "inherit", textDecoration: "none" }}>
+                <Typography variant="h6" color="inherit">
+                  Archipelago
+                </Typography>
               </a>
             </Link>
             <Box sx={{ ml: 2, display: { md: "block", xs: "none" } }}>

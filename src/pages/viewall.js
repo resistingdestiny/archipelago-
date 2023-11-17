@@ -52,8 +52,7 @@ function DashboardPage(props) {
   };
 
   const calculateYield = () => {
-    // Logic to calculate expected yield based on token and risk type
-    // For now, it's a placeholder
+ 
     setExpectedYield("Estimated Yield: X%");
   };
  
