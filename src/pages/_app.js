@@ -45,22 +45,20 @@ function MyApp({ Component, serverEmotionCache, pageProps }) {
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}>
           <ThemeProvider serverEmotionCache={serverEmotionCache}>
-              <Navbar2
-                color="primary"
-                logo="logo.png"
-                logoInverted="logo.png"
-              />
-              <Component {...pageProps} />
-              <Footer
-                bgColor="primary"
-                size="medium"
-                bgImage=""
-                bgImageOpacity={1}
-                copyright={`© ${new Date().getFullYear()} Cat Exchange`}
-                logo="logo.png"
-                logoInverted="logo.png"
-                sticky={false}
-              />
+          <Navbar2
+            logo="logo.png"
+            logoInverted="logo.png"
+          />
+          <Component {...pageProps} />
+          <Footer
+            size="medium"
+            bgImage=""
+            bgImageOpacity={1}
+            copyright={`© ${new Date().getFullYear()} Cat Exchange`}
+            logo="logo.png"
+            logoInverted="logo.png"
+            sticky={false}
+          />
           </ThemeProvider>
       </RainbowKitProvider>
     </WagmiConfig>
