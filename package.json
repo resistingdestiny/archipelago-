@@ -39,7 +39,7 @@
     "react-query": "3.32.1",
     "react-router-dom": "^6.19.0",
     "react-scripts": "^5.0.1",
-    "recharts": "^2.4.3",
+    "recharts": "^2.9.3",
     "stripe": "8.132.0",
     "use-local-storage-state": "9.0.2",
     "wagmi": "^0.11.7",

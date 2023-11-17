@@ -14,10 +14,18 @@ import {
   Tab,
   Tabs,
   Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapComponent from 'components/MapComponent'
+import PerformanceChart from "components/PerformanceComponent";
 
 const useStyles = makeStyles((theme) => ({
   // Add all your styles here
@@ -62,6 +70,14 @@ const useStyles = makeStyles((theme) => ({
   },
   subtitle: {
     color: theme.palette.grey[500],
+  },
+  premium: {
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  loss: {
+    fontWeight: 'bold',
+    color: 'red',
   },
   section: {
     margin: theme.spacing(2, 0),
@@ -158,9 +174,25 @@ function PoolPage() {
       streetViewImageUrl: '/path-to-ephesus-street-view.jpg'
     }
   ];
+
+  const rows = [
+    { date: "2023-01-01", type: "Premium Earned", amount: "$500.00", description: "Monthly premium" },
+    { date: "2023-02-01", type: "Loss", amount: "-$200.00", description: "Claim payout" },
+    // ... more rows
+  ];
+  
   const classes = useStyles();
   const [tabValue, setTabValue] = React.useState(0);
- 
+  const getAmountStyle = (type) => {
+    switch (type) {
+      case 'Premium Earned':
+        return classes.premium;
+      case 'Loss':
+        return classes.loss;
+      default:
+        return null;
+    }
+  };
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -218,7 +250,38 @@ function PoolPage() {
           </Typography>
           <LinearProgress variant="determinate" value={50} />
           <MapComponent locations={locations} />
+          <Box mt={4}>
 
+          <PerformanceChart />
+          </Box>
+          <Box mt={4}>
+  {/* Activity Table */}
+  <TableContainer component={Paper} className={classes.table}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Date</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell align="right">Amount</TableCell>
+                <TableCell>Description</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell component="th" scope="row">
+                    {row.date}
+                  </TableCell>
+                  <TableCell>{row.type}</TableCell>
+                  <TableCell align="right" className={getAmountStyle(row.type)}>
+            {row.amount}
+          </TableCell>                  <TableCell>{row.description}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        </Box>
         </Box>
         <Box>
 

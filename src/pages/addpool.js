@@ -14,7 +14,6 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import SelectLocationMap from 'components/MapSelect'
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiYXJjaGlwZWxhZ29pc3QiLCJhIjoiY2xwMzFsOGEzMTM5dTJ2cWt0cm5yczNvdSJ9.Nuufq_-aH3Guaw07whe-tQ'
 
 const useStyles = makeStyles((theme) => ({
   submitButton: {
@@ -129,19 +128,7 @@ function AddPoolPage() {
                 radius={radius}
               />
                 </div> 
-                <FormGroup className={classes.formGroup}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      className={classes.checkbox}
-                      checked={applyForUNFund}
-                      onChange={handleCheckboxChange}
-                      name="applyForUNFund"
-                    />
-                  }
-                  label="Apply for UN fund"
-                />
-              </FormGroup>
+             
               <Button
                 type="submit"
                 color="primary"
