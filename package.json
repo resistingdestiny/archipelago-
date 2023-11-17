@@ -27,6 +27,7 @@
     "firebase": "9.1.0",
     "firebase-admin": "9.12.0",
     "mailchimp-api-v3": "1.14.0",
+    "mapbox-gl": "^2.15.0",
     "next": "12.0.2",
     "path-parser": "6.1.0",
     "query-string": "6.13.8",

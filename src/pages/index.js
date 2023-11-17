@@ -45,12 +45,12 @@ function IndexPage() {
             Archipelago
           </Typography>
           <Typography variant="h5" className={classes.heroSubtitle}>
-           Earn yields while keeping the world safe.
+           Earn yields, protect the world
           </Typography>
           <Button 
             variant="contained" 
             className={classes.ctaButton}
-            href="/pricing"
+            href="/yields"
           >
             Get Started
           </Button>

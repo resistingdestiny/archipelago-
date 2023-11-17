@@ -44,9 +44,19 @@ function Navbar2(props) {
               </a>
             </Link>
             <Box sx={{ ml: 2, display: { md: "block", xs: "none" } }}>
-            <Link href="/viewall" passHref={true}>
+            <Link href="/yields" passHref={true}>
                 <Button color="inherit" component="a">
-                  Dashboard{" "}
+                  Products
+                </Button>
+              </Link>
+              <Link href="/portfolio" passHref={true}>
+                <Button color="inherit" component="a">
+                  Portfolio
+                </Button>
+              </Link>
+              <Link href="/addpool" passHref={true}>
+                <Button color="inherit" component="a">
+                  Cover
                 </Button>
               </Link>
              

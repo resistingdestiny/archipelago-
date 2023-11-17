@@ -15,6 +15,9 @@ import {
   Tabs,
   Link,
 } from "@mui/material";
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import MapComponent from 'components/MapComponent'
 
 const useStyles = makeStyles((theme) => ({
   // Add all your styles here
@@ -23,6 +26,9 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '100vh',
     padding: theme.spacing(4),
     color: 'white',
+  },
+  mapContainer: {
+    height: '400px', 
   },
   card: {
     background: 'rgba(25, 25, 25, 0.9)', // Semi-transparent dark card background
@@ -118,13 +124,43 @@ const useStyles = makeStyles((theme) => ({
   tabs: {
     borderBottom: '1px solid rgba(255, 255, 255, 0.23)',
   },
-  // ... add more styles here
 }));
 
 function PoolPage() {
+
+  const locations = [
+    {
+      title: 'Istanbul',
+      latitude: 41.0082,
+      longitude: 28.9784,
+      description: 'The historical and economic hub of Turkey.',
+      streetViewImageUrl: '/path-to-istanbul-street-view.jpg'
+    },
+    {
+      title: 'Ankara',
+      latitude: 39.9334,
+      longitude: 32.8597,
+      description: 'The capital city of Turkey, known for its government buildings and museums.',
+      streetViewImageUrl: '/path-to-ankara-street-view.jpg'
+    },
+    {
+      title: 'Cappadocia',
+      latitude: 38.6431,
+      longitude: 34.8289,
+      description: 'Famous for its unique geological formations and hot air balloon flights.',
+      streetViewImageUrl: '/path-to-cappadocia-street-view.jpg'
+    },
+    {
+      title: 'Ephesus',
+      latitude: 37.9398,
+      longitude: 27.3403,
+      description: 'An ancient Greek city with well-preserved ruins and a rich history.',
+      streetViewImageUrl: '/path-to-ephesus-street-view.jpg'
+    }
+  ];
   const classes = useStyles();
   const [tabValue, setTabValue] = React.useState(0);
-
+ 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -178,9 +214,15 @@ function PoolPage() {
 
         <Box className={classes.section}>
           <Typography variant="h5" className={classes.title}>
-            Weekly Strategy Snapshot
+           Locations
           </Typography>
           <LinearProgress variant="determinate" value={50} />
+          <MapComponent locations={locations} />
+
+        </Box>
+        <Box>
+
+
         </Box>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -216,8 +258,27 @@ function PoolPage() {
               )}
               {tabValue === 1 && (
                 <CardContent>
-
-                </CardContent>
+                <Typography gutterBottom variant="h6" component="div">
+                  Withdraw
+                </Typography>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  label="Amount (SAVAX)"
+                  className={classes.input}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={() => handleWithdraw(/* pass withdrawal amount here */)}
+                >
+                  Disconnect Wallet
+                </Button>
+                <Typography variant="body2" color="textSecondary" >
+                  Withdrawals are processed instantly. A withdrawal fee may apply.
+                </Typography>
+              </CardContent>
               )}
             </Card>
   <Box display="flex" justifyContent="center" alignItems="center" className={classes.section}>
