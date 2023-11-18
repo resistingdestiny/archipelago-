@@ -276,7 +276,7 @@ function PoolPage() {
       </Typography>
     </Box>      </Grid>
     <Grid item xs={4} style={{ textAlign: 'center' }}>
-  <img src='/images/hurricane.png' alt="Product" style={{ maxWidth: '70%', height: 'auto' }} />
+  <img src='images/hurricane.png' alt="Product" style={{ maxWidth: '70%', height: 'auto' }} />
 
   <Box display="flex" justifyContent="center" mt={1}>
     <Chip
