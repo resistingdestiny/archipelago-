@@ -7,7 +7,7 @@ const MapComponent = ({ locations }) => {
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
-    mapboxgl.accessToken = '';
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
