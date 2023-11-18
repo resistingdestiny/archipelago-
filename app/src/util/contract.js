@@ -15,7 +15,7 @@ const permit2Abi = '[{"inputs":[{"internalType":"uint256","name":"deadline","typ
 // wbit token address
 
 const provider = new ethers.providers.JsonRpcProvider(
-    "https://rpc.testnet.mantle.xyz"
+    "https://goerli.gateway.tenderly.co"
   );
 
   const approvingContract = new ethers.Contract(staking_token_address, ERC20_abi, provider )
@@ -26,4 +26,4 @@ const provider = new ethers.providers.JsonRpcProvider(
     //Approving (token address, token_abi, provider)
   //Signing (pooling contract adddress, pooling, mantle)
 
-export { abi, approvingContract, signingContract, approveInsuranceContract };
+export { ERC20_abi, abi, approvingContract, signingContract, approveInsuranceContract };
