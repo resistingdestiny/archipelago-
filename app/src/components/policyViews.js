@@ -8,118 +8,113 @@ import { ethers } from 'ethers';
 export async function getPoliciesRequestingUnicefFunding(provider) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getPoliciesRequestingUnicefFunding();
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getPoliciesRequestingUnicefFunding();
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching policies requesting UNICEF funding:", error);
-      return [];
+        console.error("Error fetching policies requesting UNICEF funding:", error);
+        return [];
     }
 }
 
 export async function getPoliciesWithUnicefFunding(provider) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getPoliciesWithUnicefFunding();
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getPoliciesWithUnicefFunding();
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching policies with UNICEF funding:", error);
-      return [];
+        console.error("Error fetching policies with UNICEF funding:", error);
+        return [];
     }
 }
 
 export async function getAllPolicies(provider) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getAllPolicies();
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getAllPolicies();
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching all policies:", error);
-      return [];
+        console.error("Error fetching all policies:", error);
+        return [];
     }
 }
 
 export async function getAllLivePolicies(provider) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getAllLivePolicies();
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getAllLivePolicies();
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching live policies:", error);
-      return [];
+        console.error("Error fetching live policies:", error);
+        return [];
     }
 }
 
 export async function getAllFinishedPolicies(provider) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getAllFinishedPolicies();
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getAllFinishedPolicies();
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching finished policies:", error);
-      return [];
+        console.error("Error fetching finished policies:", error);
+        return [];
     }
 }
 
 export async function getPoliciesForInvestor(provider, investorAddress) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getPoliciesForInvestor(investorAddress);
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getPoliciesForInvestor(investorAddress);
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching policies for investor:", error);
-      return [];
+        console.error("Error fetching policies for investor:", error);
+        return [];
     }
 }
 
 export async function getPoliciesForCreator(provider, creatorAddress) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getPoliciesForCreator(creatorAddress);
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getPoliciesForCreator(creatorAddress);
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching policies for creator:", error);
-      return [];
+        console.error("Error fetching policies for creator:", error);
+        return [];
     }
 }
 
 export async function getPoliciesForRegion(provider, region) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getPoliciesForRegion(region);
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getPoliciesForRegion(region);
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching policies for region:", error);
-      return [];
+        console.error("Error fetching policies for region:", error);
+        return [];
     }
 }
 
 export async function getPoliciesByType(provider, poolType) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.getPoliciesByType(poolType);
-      return policies.map(policy => formatPolicy(policy));
+        const policies = await contract.getPoliciesByType(poolType);
+        return policies.map(policy => formatPolicy(policy));
     } catch (error) {
-      console.error("Error fetching policies for region:", error);
-      return [];
+        console.error("Error fetching policies for region:", error);
+        return [];
     }
 }
 
 export async function getPolicyById(provider, policyId) {
     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
     try {
-      const policies = await contract.insurancePolicies(policyId);
+        const policies = await contract.insurancePolicies(policyId);
+        const updatedPolicies = { ...policies, policyId: policyId };
 
-      // Add policyId to each policy before formatting
-      const formattedPolicies = policies.map(policy => {
-        // Include policyId in the policy object before formatting
-        const policyWithId = {...policy, policyId};
-        return formatPolicy(policyWithId); // Format the policy with the policyId included
-      });
+        return formatPolicy(updatedPolicies); // Format the policy with the policyId included
 
-      return formattedPolicies;
     } catch (error) {
-      console.error("Error fetching policies by id:", error);
-      return [];
+        console.error("Error fetching policies by id:", error);
+        return [];
     }
 }
 

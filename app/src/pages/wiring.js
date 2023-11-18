@@ -7,7 +7,7 @@ import { useAccount, useConnect, useProvider } from 'wagmi';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { ethers } from 'ethers';
 import { insurancePolicyAddress, insurancePolicyABI } from "../util/config-var";
-import {getAllPolicies} from "../components/policyViews";
+import {getPolicyById} from "../components/policyViews";
 
 // Async function to fetch policy data
 
@@ -22,7 +22,8 @@ function DashboardPage(props) {
 
 
   useEffect(() => {
-    getAllPolicies(provider).then(data => {
+    
+    getPolicyById(provider, 0).then(data => {
       console.log(data);
       setPolicies(data);
     }).catch(error => {
