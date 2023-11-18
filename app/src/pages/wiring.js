@@ -7,7 +7,7 @@ import { useAccount, useConnect, useProvider } from 'wagmi';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { ethers } from 'ethers';
 import { insurancePolicyAddress, insurancePolicyABI } from "../util/config-var";
-import {getpolicy} from "../components/policyViews";
+import {getAllPolicies} from "../components/policyViews";
 
 // Async function to fetch policy data
 
@@ -20,13 +20,16 @@ function DashboardPage(props) {
     connector: new InjectedConnector(),
   });
 
-  useEffect(() => {
-   
-      const ethersProvider = new ethers.providers.JsonRpcProvider('https://goerli.gateway.tenderly.co');
-      getpolicy(ethersProvider).then(data => setPolicies(data));
-  
-  }, [provider.connection.url]); // useEffect dependency on provider URL
 
+  useEffect(() => {
+    getAllPolicies(provider).then(data => {
+      console.log(data);
+      setPolicies(data);
+    }).catch(error => {
+      console.error("Error fetching policies:", error);
+    });
+  }, [provider.connection.url]); // useEffect dependency on provider URL
+  
 
   return (
     <Box>
