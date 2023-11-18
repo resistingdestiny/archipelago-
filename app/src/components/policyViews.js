@@ -24,17 +24,18 @@ import { ethers } from 'ethers';
 
 // export default GetAllFinishedPolicies;
 console.log('test');
-async function GetAllFinishedPolicies() {
-    const provider = useProvider();
-    console.log(provider.connection.url);
-    const ethersProvider = new ethers.providers.JsonRpcProvider(provider.connection.url);
-    
-    console.log('in fetch');
-    const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, ethersProvider);
-    const data = await contract.getAllFinishedPolicies();
-    console.log(data);
-    return data
-}
 
-export default GetAllFinishedPolicies;
+export async function getpolicy(ethersProvider) {
+    const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, ethersProvider );
+    try {
+      const data = await contract.getPoliciesRequestingUnicefFunding();
+    
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching policies:", error);
+    }
+  }
+
+
 

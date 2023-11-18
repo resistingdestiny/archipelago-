@@ -1,73 +1,38 @@
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import {
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Box,
-  IconButton,
-  Container,
-  Grid,
-  Typography,
-  Card,
-  CardContent,
-  LinearProgress,
-  Chip,
-  Button,
-  Avatar,
+  Box, // ... other imports ...
 } from '@mui/material';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-
-import { useAccount, useConnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { publicProvider } from '@wagmi/core/providers/public'
-// import { GetAllFinishedPolicies } from 'components/policyViews';
-import { useProvider } from 'wagmi';
+import { useAccount, useConnect, useProvider } from 'wagmi';
+import { InjectedConnector } from 'wagmi/connectors/injected';
 import { ethers } from 'ethers';
-import { insurancePolicyAddress, insurancePolicyABI } from "../util/config-var"; // Import your contract details
+import { insurancePolicyAddress, insurancePolicyABI } from "../util/config-var";
+import {getpolicy} from "../components/policyViews";
 
+// Async function to fetch policy data
 
-async function getpolicy() {
-    const provider = useProvider();
-    console.log(provider.connection.url);
-    const { address, isConnected } = useAccount()
-    const { connect } = useConnect({
-      connector: new InjectedConnector(),
-    })
-//   console.log(address, isConnected,connect, publicProvider);
-
-
-    console.log(provider.connection.url);
-    const ethersProvider = new ethers.providers.JsonRpcProvider(provider.connection.url);
-
-    console.log('in fetch');
-    const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, ethersProvider);
-    const data = await contract.getAllPolicies();
-    return data;
-    console.log(data);
-}
 
 function DashboardPage(props) {
-    getpolicy()
-//     const provider = useProvider();
-//     console.log(provider.connection.url);
-//     const { address, isConnected } = useAccount()
-//     const { connect } = useConnect({
-//       connector: new InjectedConnector(),
-//     })
-// //   console.log(address, isConnected,connect, publicProvider);
+  const [policies, setPolicies] = useState([]);
+  const provider = useProvider();
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  });
+
+  useEffect(() => {
+   
+      const ethersProvider = new ethers.providers.JsonRpcProvider('https://goerli.gateway.tenderly.co');
+      getpolicy(ethersProvider).then(data => setPolicies(data));
+  
+  }, [provider.connection.url]); // useEffect dependency on provider URL
 
 
-//     console.log(provider.connection.url);
-//     const ethersProvider = new ethers.providers.JsonRpcProvider(provider.connection.url);
-
-//     console.log('in fetch');
-//     const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, ethersProvider);
-//     const data = contract.getAllPolicies();
-//     console.log(data);
-    return 'suck'
+  return (
+    <Box>
+      {/* Render policies or other components */}
+    </Box>
+  );
 }
 
 export default DashboardPage;
