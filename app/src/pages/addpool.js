@@ -455,7 +455,7 @@ function AddPoolPage() {
   const [stakingTokenAddress, setStakingTokenAddress] = useState("0xc0A7F1B0c9988FbC123f688a521387A51596da47");
 
   const {data: signer, isError, isLoading} = useSigner();
-
+  const [isTransactionError, setIsTransactionError] = useState(false); 
   const [formData, setFormData] = useState({
     limit: "100000",
     region: "BenAss",
@@ -613,8 +613,8 @@ const [selectedToken, setSelectedToken] = useState('');
         const tx = await write();
         console.log('Transaction initiated:', tx);
       } else {
-        console.log('death', config)
         console.error('Contract write function is not available');
+        setIsTransactionError(true);
       }
     } catch (error) {
       console.error('Error executing contract write:', error);
@@ -668,6 +668,13 @@ const approveInsuranceContract = new ethers.Contract(stakingTokenAddress, ERC20_
             <Typography variant="h4" className={classes.title}>
               Add New Pool
             </Typography>
+            {isTransactionError && (
+                <Box color="error.main" mb={2}>
+                  <Typography variant="body1">
+                    Please make sure all form elements are completed correctly 
+                  </Typography>
+                </Box>
+              )}
             <form onSubmit={handleFormSubmit} className={classes.formContainer}>
               <TextField
                 required
