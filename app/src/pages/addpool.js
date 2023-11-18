@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import Web3 from "web3";
 import { ethers } from "ethers";
+import {approveInsuranceContract} from "../util/contract";
+import {useSigner} from "wagmi";
 
 
 import mapboxgl from 'mapbox-gl';
@@ -22,7 +24,6 @@ import { DatePicker, LocalizationProvider, MobileDatePicker, DesktopDatePicker, 
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi';
 
-import { create } from '@web3-storage/w3up-client';
 const contractAddress = '0x682E2dB786aAae2E0D383Fe902EDbd74df5C342D';
   const contractABI = [
     {
@@ -444,6 +445,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AddPoolPage() {
+  const {data: signer, isError, isLoading} = useSigner();
+
   const [formData, setFormData] = useState({
     limit: "100000",
     region: "BenAss",
@@ -491,7 +494,15 @@ function AddPoolPage() {
 
 console.log('contractargs', contractArgs)
 
-
+const tokens = {
+  "Goerli": {
+    "COCCCK": "0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4"
+  },
+  "Ethereum": {
+    "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  }
+};
+const [selectedToken, setSelectedToken] = useState('');
 
   
  /*  const [isClientReady, setIsClientReady] = useState(false);
@@ -651,6 +662,11 @@ const handleAmountNeededChange = (event) => {
     limit: event.target.value             
   }));
 };
+function handleChange(event) {
+  setSelectedToken(event.target.value);
+  console.log(event.target.value)
+  setFormData({ ...formData, denomination: event.target.value });
+}
 
 // Update the formData state when 'Risk' input changes
 const handleRiskChange = (event) => {
@@ -659,10 +675,12 @@ const handleRiskChange = (event) => {
     poolType: event.target.value
   }));
 };
-  
+const approveContract = approveInsuranceContract.connect(signer)
+
   const riskSliderClasses = riskSliderStyles();
   const estimatedPremiums = 10
   const estimatedRisk = 10
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
 
@@ -718,17 +736,19 @@ const handleRiskChange = (event) => {
       />
       <Typography gutterBottom>Select Token for Collateral:</Typography> 
       <Select
-        labelId="token-select-label"
-        id="token-select"
-        value={token}
-        variant="outlined"
-        onChange={handleTokenChange}
-      >
-        <MenuItem value={'ETH'}>ETH</MenuItem>
-        <MenuItem value={'BTC'}>BTC</MenuItem>
-        <MenuItem value={'DOT'}>DOT</MenuItem>
-        <MenuItem value={'ADA'}>ADA</MenuItem>
-      </Select>
+  value={selectedToken}
+  onChange={handleChange}
+  variant="outlined"
+  label="Token for Collateral"
+>
+  {Object.entries(tokens).map(([network, tokens]) =>
+    Object.entries(tokens).map(([name, address]) => (
+      <MenuItem key={address} value={address}>
+        {network} - {name}
+      </MenuItem>
+    ))
+  )}
+</Select>
       <Typography gutterBottom>Radius (km): {radius}</Typography>
 
               <Slider
