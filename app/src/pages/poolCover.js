@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     height: '400px', 
   },
   card: {
-    background: 'rgba(25, 25, 25, 0.9)', // Semi-transparent dark card background
+    background: 'rgba(41,41,41, 0.9)', // Semi-transparent dark card background
     backdropFilter: 'blur(10px)',
     borderRadius: '15px',
     color: 'white',
@@ -313,6 +313,7 @@ const risk = parseInt(policy?.probability);
       <Grid item xs={8}>
         <Typography variant="h4" className={classes.title}>
           {policy?.poolType}
+          <Chip label="Policy" variant="outlined" sx={{marginLeft: 3, }}className={classes.chip}/> 
         </Typography>
         <Typography variant="subtitle1" className={classes.subtitle}>
           Current Maximum Cover 
@@ -369,7 +370,7 @@ This cover protects you against major earthquake and can payout before an event 
 
         <Box className={classes.section}>
           <Typography variant="h5" className={classes.title}>
-           Locations
+           Location
           </Typography>
           <LinearProgress variant="determinate" value={50} />
           <MapComponent locations={locations} />

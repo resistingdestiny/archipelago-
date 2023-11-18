@@ -313,6 +313,7 @@ function PoolPage() {
       <Grid item xs={8}>
         <Typography variant="h4" className={classes.title}>
         {poolName}
+        <Chip label="Island" variant="outlined" sx={{marginLeft: 3, }}className={classes.chip}/> 
         </Typography>
         <Typography variant="subtitle1" className={classes.subtitle}>
           Current Vault Deposits
