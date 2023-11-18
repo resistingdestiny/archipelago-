@@ -93,8 +93,20 @@ export async function getPoliciesForRegion(provider, region) {
     }
 }
 
+export async function getPoliciesByType(provider, poolType) {
+    const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
+    try {
+      const policies = await contract.getPoliciesByType(poolType);
+      return policies.map(policy => formatPolicy(policy));
+    } catch (error) {
+      console.error("Error fetching policies for region:", error);
+      return [];
+    }
+}
+
 function formatPolicy(policy) {
     return {
+        policyId: policy.policyId.toString(),
         limit: policy.limit.toString(),
         region: policy.region,
         location: {

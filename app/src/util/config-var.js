@@ -1,4 +1,4 @@
-export const insurancePolicyAddress = "0x4dFf164AbE5B75018bA8f5b9f7166aCcc4C12406";
+export const insurancePolicyAddress = "0xcF1a6099eeb2AB657b7dB39042782ed041E0CF3A";
 
 export const insurancePolicyABI = [
 	{
@@ -156,6 +156,11 @@ export const insurancePolicyABI = [
 				"components": [
 					{
 						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
 						"name": "limit",
 						"type": "uint256"
 					},
@@ -275,6 +280,11 @@ export const insurancePolicyABI = [
 				"components": [
 					{
 						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
 						"name": "limit",
 						"type": "uint256"
 					},
@@ -392,6 +402,11 @@ export const insurancePolicyABI = [
 		"outputs": [
 			{
 				"components": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
 					{
 						"internalType": "uint256",
 						"name": "limit",
@@ -549,6 +564,136 @@ export const insurancePolicyABI = [
 	{
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "poolType",
+				"type": "string"
+			}
+		],
+		"name": "getPoliciesByType",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "limit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "region",
+						"type": "string"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "longitude",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "latitude",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "radius",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct InsurancePolicyContract.Location",
+						"name": "location",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "start",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "end",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct InsurancePolicyContract.Period",
+						"name": "coverPeriod",
+						"type": "tuple"
+					},
+					{
+						"internalType": "uint256",
+						"name": "probability",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "poolType",
+						"type": "string"
+					},
+					{
+						"internalType": "bool",
+						"name": "requestFundFromUNICEF",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "receivedFundFromUNICEF",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "premium",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "fundsCommitted",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "denomination",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					},
+					{
+						"internalType": "address[]",
+						"name": "acceptedTokens",
+						"type": "address[]"
+					},
+					{
+						"internalType": "address",
+						"name": "creator",
+						"type": "address"
+					},
+					{
+						"internalType": "address[]",
+						"name": "usersCommitted",
+						"type": "address[]"
+					}
+				],
+				"internalType": "struct InsurancePolicyContract.InsurancePolicyView[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "creator",
 				"type": "address"
@@ -558,6 +703,11 @@ export const insurancePolicyABI = [
 		"outputs": [
 			{
 				"components": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
 					{
 						"internalType": "uint256",
 						"name": "limit",
@@ -685,6 +835,11 @@ export const insurancePolicyABI = [
 				"components": [
 					{
 						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
 						"name": "limit",
 						"type": "uint256"
 					},
@@ -810,6 +965,11 @@ export const insurancePolicyABI = [
 				"components": [
 					{
 						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
 						"name": "limit",
 						"type": "uint256"
 					},
@@ -929,6 +1089,11 @@ export const insurancePolicyABI = [
 				"components": [
 					{
 						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
 						"name": "limit",
 						"type": "uint256"
 					},
@@ -1046,6 +1211,11 @@ export const insurancePolicyABI = [
 		"outputs": [
 			{
 				"components": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
 					{
 						"internalType": "uint256",
 						"name": "limit",
@@ -1406,4 +1576,3 @@ export const insurancePolicyABI = [
 		"type": "function"
 	}
 ]
-  

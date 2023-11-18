@@ -249,6 +249,7 @@ contract InsurancePolicyContract {
     }
 
     struct InsurancePolicyView {
+        uint256 policyId;
         uint256 limit;
         string region;
         Location location;
@@ -267,13 +268,14 @@ contract InsurancePolicyContract {
     }
 
     // Helper function to convert InsurancePolicy to InsurancePolicyView
-    function _convertToView(InsurancePolicy storage policy)
+    function _convertToView(InsurancePolicy storage policy, uint256 policyId)
         private
         view
         returns (InsurancePolicyView memory)
     {
         return
             InsurancePolicyView(
+                policyId,
                 policy.limit,
                 policy.region,
                 policy.location,
@@ -310,7 +312,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].requestFundFromUNICEF) {
-                policies[index++] = _convertToView(insurancePolicies[i]);
+                policies[index++] = _convertToView(insurancePolicies[i],i);
             }
         }
         return policies;
@@ -334,7 +336,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].receivedFundFromUNICEF) {
-                policies[index++] = _convertToView(insurancePolicies[i]);
+                policies[index++] = _convertToView(insurancePolicies[i],i);
             }
         }
         return policies;
@@ -349,7 +351,7 @@ contract InsurancePolicyContract {
             nextPolicyId
         );
         for (uint256 i = 0; i < nextPolicyId; i++) {
-            policies[i] = _convertToView(insurancePolicies[i]);
+            policies[i] = _convertToView(insurancePolicies[i],i);
         }
         return policies;
     }
@@ -373,7 +375,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].active) {
-                livePolicies[index++] = _convertToView(insurancePolicies[i]);
+                livePolicies[index++] = _convertToView(insurancePolicies[i],i);
             }
         }
         return livePolicies;
@@ -398,7 +400,7 @@ contract InsurancePolicyContract {
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (!insurancePolicies[i].active) {
                 finishedPolicies[index++] = _convertToView(
-                    insurancePolicies[i]
+                    insurancePolicies[i],i
                 );
             }
         }
@@ -424,7 +426,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].userFundsCommittedDenominated[user] > 0) {
-                userPolicies[index++] = _convertToView(insurancePolicies[i]);
+                userPolicies[index++] = _convertToView(insurancePolicies[i],i);
             }
         }
         return userPolicies;
@@ -448,7 +450,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].creator == creator) {
-                creatorPolicies[index++] = _convertToView(insurancePolicies[i]);
+                creatorPolicies[index++] = _convertToView(insurancePolicies[i],i);
             }
         }
         return creatorPolicies;
@@ -479,12 +481,42 @@ contract InsurancePolicyContract {
                 keccak256(bytes(insurancePolicies[i].region)) ==
                 keccak256(bytes(region))
             ) {
-                regionPolicies[index++] = _convertToView(insurancePolicies[i]);
+                regionPolicies[index++] = _convertToView(insurancePolicies[i],i);
             }
         }
         return regionPolicies;
     }
 
+    // View function to get all policies for a given region
+    function getPoliciesByType(string memory poolType)
+        public
+        view
+        returns (InsurancePolicyView[] memory)
+    {
+        uint256 count = 0;
+        for (uint256 i = 0; i < nextPolicyId; i++) {
+            if (
+                keccak256(bytes(insurancePolicies[i].poolType)) ==
+                keccak256(bytes(poolType))
+            ) {
+                count++;
+            }
+        }
+
+        InsurancePolicyView[] memory poolPolicies = new InsurancePolicyView[](
+            count
+        );
+        uint256 index = 0;
+        for (uint256 i = 0; i < nextPolicyId; i++) {
+            if (
+                keccak256(bytes(insurancePolicies[i].poolType)) ==
+                keccak256(bytes(poolType))
+            ) {
+                poolPolicies[index++] = _convertToView(insurancePolicies[i],i);
+            }
+        }
+        return poolPolicies;
+    }
     // Struct to hold committed amounts in individual tokens
     struct CommittedAmounts {
         address token;
