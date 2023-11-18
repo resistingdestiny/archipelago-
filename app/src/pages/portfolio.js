@@ -14,11 +14,13 @@ import {
   TableRow,
   Paper,
   TableContainer,
+  Button,
 } from "@mui/material";
 import PerformanceChart from "components/PerformanceComponent";
 import { useBalance } from 'wagmi';
 import { useAccount, useProvider } from 'wagmi';
 import { getPoliciesForCreator, getPoliciesForInvestor, getPoliciesRequestingUnicefFunding, getPoliciesWithUnicefFunding } from 'components/policyViews';
+import Link from '@mui/material/Link';
 
 function App() {
   const { address, isConnecting, isDisconnected } = useAccount()
@@ -158,14 +160,23 @@ function PortfolioPage() {
         </TableHead>
         <TableBody>
           {policies.map((policy, index) => (
+
             <TableRow key={index}>
+
               <TableCell>{policy.policyId}</TableCell>
               <TableCell>{policy.poolType}</TableCell>
               <TableCell align="right">{policy.premium}</TableCell>
               <TableCell align="right">{policy.limit}</TableCell>
               <TableCell align="right">{policy.active ? 'Yes' : 'No'}</TableCell>
-              {/* Add more cells as needed */}
+              <TableCell>
+              <Link href={`/poolCover?id=${policy.policyId}`} color="inherit" underline="none">
+                <Button variant="contained" color="primary" size="small">
+                  View
+                </Button>
+              </Link>
+            </TableCell>
             </TableRow>
+
           ))}
         </TableBody>
       </Table>

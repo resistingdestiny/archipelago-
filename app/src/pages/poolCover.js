@@ -202,16 +202,14 @@ function PoolPage() {
   const id = 0;
 const [policy, setPolicy] = React.useState(null);
 useEffect(() => {
-  if (id) {
     getPolicyById(provider, id)
       .then(data => setPolicy(data))
       .catch(error => console.error("Error fetching data:", error));
 
-  }
+  
 }, [id, provider]);
-console.log(policy)
   const [modalOpen, setModalOpen] = React.useState(true);
-
+const risk = parseInt(policy?.probability);
   const locations = [
     {
       title: 'Istanbul',
@@ -311,13 +309,13 @@ console.log(policy)
     <Grid container spacing={2} alignItems="center">
       <Grid item xs={8}>
         <Typography variant="h4" className={classes.title}>
-          Turkey Earthquake
+          {policy?.poolType}
         </Typography>
         <Typography variant="subtitle1" className={classes.subtitle}>
           Current Maximum Cover 
         </Typography>
         <Typography variant="h6">
-         10 ETH
+         {policy?.limit}
         </Typography>
        
         <Box sx={{ marginTop: 3, width: '50%' }}>
@@ -326,15 +324,15 @@ console.log(policy)
       </Typography>
       <Slider
         aria-label="Risk Level"
-        defaultValue={10}
+        defaultValue={risk}
         valueLabelDisplay="auto" 
         getAriaValueText={() => `10% chance of total loss`}
         step={null}
-        marks={[{ value: 10, label: '' }]} 
+        marks={[{ value: {risk}, label: '' }]} 
         className={classes.riskSlider}
       />
       <Typography variant="caption" className={classes.riskLabel}>
-        10% chance of payment in a given year.
+       {risk} chance of payment in a given year.
       </Typography>
     </Box>      </Grid>
     <Grid item xs={4} style={{ textAlign: 'center' }}>

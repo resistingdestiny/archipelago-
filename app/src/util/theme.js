@@ -10,7 +10,6 @@ import { createLocalStorageStateHook } from "use-local-storage-state";
 const clientEmotionCache = createCache({ key: "css", prepend: true });
 
 const themeConfig = {
-  // Dark theme inspired by Ribbon Finance
   dark: {
     palette: {
       mode: "dark",
