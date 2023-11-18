@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { makeStyles } from '@mui/styles';
 import {
   Box,
@@ -11,6 +11,8 @@ import {
   Typography, Checkbox, FormControlLabel, FormGroup,
   Collapse,  Select, MenuItem,
 } from '@mui/material';
+import Web3 from "web3";
+import { ethers } from "ethers";
 
 
 import mapboxgl from 'mapbox-gl';
@@ -18,6 +20,354 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import SelectLocationMap from 'components/MapSelect'
 import { DatePicker, LocalizationProvider, MobileDatePicker, DesktopDatePicker, CalendarPicker } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi';
+
+import { create } from '@web3-storage/w3up-client';
+const contractAddress = '0x682E2dB786aAae2E0D383Fe902EDbd74df5C342D';
+  const contractABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_uniswapPool",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "policyId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "commitFunds",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_limit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_region",
+          "type": "string"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "longitude",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "latitude",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "radius",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct InsurancePolicyContract.Location",
+          "name": "_location",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "start",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "end",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct InsurancePolicyContract.Period",
+          "name": "_coverPeriod",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_probability",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_poolType",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "_requestFundFromUNICEF",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_premium",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_denomination",
+          "type": "address"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_acceptedTokens",
+          "type": "address[]"
+        }
+      ],
+      "name": "createInsurancePolicy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllPolicies",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "limit",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "region",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "longitude",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "latitude",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "radius",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct InsurancePolicyContract.Location",
+              "name": "location",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "start",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "end",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct InsurancePolicyContract.Period",
+              "name": "coverPeriod",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint256",
+              "name": "probability",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "poolType",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "requestFundFromUNICEF",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "premium",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fundsCommitted",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "denomination",
+              "type": "address"
+            },
+            {
+              "internalType": "address[]",
+              "name": "acceptedTokens",
+              "type": "address[]"
+            }
+          ],
+          "internalType": "struct InsurancePolicyContract.InsurancePolicy[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "insurancePolicies",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "limit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "region",
+          "type": "string"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "longitude",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "latitude",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "radius",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct InsurancePolicyContract.Location",
+          "name": "location",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "start",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "end",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct InsurancePolicyContract.Period",
+          "name": "coverPeriod",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256",
+          "name": "probability",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "poolType",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "requestFundFromUNICEF",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "premium",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fundsCommitted",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "denomination",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextPolicyId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "uniswapPool",
+      "outputs": [
+        {
+          "internalType": "contract IUniswapV3Pool",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+  
+    
+  const contractFunctionName = 'createInsurancePolicy'; // Function to call
 
 const riskSliderStyles = makeStyles((theme) => ({
   riskSlider: {
@@ -94,17 +444,101 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AddPoolPage() {
+  const [formData, setFormData] = useState({
+    limit: "100000",
+    region: "BenAss",
+    longitude: "10",
+    latitude: "10",
+    radius: "10000",
+    startPeriod: "1700305970",
+    endPeriod: "1700306970",
+    probability: "900",
+    poolType: "Flood",
+    requestFundFromUNICEF: true,
+    premium: "100",
+    denomination: "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+    acceptedTokens: [
+      "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+      "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+    ]
+  });
+ const [contractArgs, setContractArgs] = useState([]);
+
+  useEffect(() => {
+    setContractArgs([
+      ethers.BigNumber.from(formData._limit || "100000"),
+      formData._region || "BenAss",
+      [
+        ethers.BigNumber.from(formData._location?.longitude || "10"),
+        ethers.BigNumber.from(formData._location?.latitude || "10"),
+        ethers.BigNumber.from(formData._location?.radius || "10000")
+      ],
+      [
+        ethers.BigNumber.from(formData._coverPeriod?.start || "1700305970"),
+        ethers.BigNumber.from(formData._coverPeriod?.end || "1700306970")
+      ],
+      ethers.BigNumber.from(formData._probability || "900"),
+      formData._poolType,
+      formData._requestFundFromUNICEF !== undefined ? formData._requestFundFromUNICEF : true,
+      ethers.BigNumber.from(formData._premium || "100"),
+      formData._denomination || "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+      formData._acceptedTokens || [
+        "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+        "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+      ]
+    ]);
+  }, [formData]);
+
+console.log('contractargs', contractArgs)
+
+
+
+  
+ /*  const [isClientReady, setIsClientReady] = useState(false);
+  const clientRef = useRef(null); 
+  const initializeStorage = async () => {
+    try {
+      // Create a new client instance
+      const client = await create();
+      clientRef.current = client;
+
+      // Create a new space
+      const space = await client.createSpace('my-awesome-space');
+      // Set the current space
+      await client.setCurrentSpace(space.did());
+
+      // Register the space
+      try {
+        await client.registerSpace('benedict@destinymedia.co.uk', { provider: 'did:web:web3.storage' });
+        setIsClientReady(true);
+      } catch (err) {
+        console.error('Space registration failed: ', err);
+      }
+    } catch (error) {
+      console.error('Error initializing storage:', error);
+    }
+  }; */
+
+  /* useEffect(() => {
+    initializeStorage();
+  }, []); */
+
+  
   const classes = useStyles();
   const [applyForUNFund, setApplyForUNFund] = useState(false);
   const [open, setOpen] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [token, setToken] = useState("");
-  const mapContainerRef = useRef(null);
+  //const mapContainerRef = useRef(null);
   const [location, setLocation] = useState(null);
   const [radius, setRadius] = useState(5);
   const handleCheckboxChange = (event) => {
     setApplyForUNFund(event.target.checked);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      requestFundFromUNICEF: event.target.checked
+    }));
   };
 
   const handleTokenChange = (event) => {
@@ -112,24 +546,120 @@ function AddPoolPage() {
   };
   const handleStartDateChange = (newStartDate) => {
     setStartDate(newStartDate);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      startPeriod: newStartDate ? newStartDate.getTime().toString() : ""
+    }));
   };
   const handleEndDateChange = (newEndDate) => {
     setEndDate(newEndDate);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      endPeriod: newEndDate ? newEndDate.getTime().toString() : ""
+    }));
   };
   const handleRadiusChange = (event, newValue) => {
     setRadius(newValue);
   };
-
-  const handleFormSubmit = (event) => {
+  
+  const handleCalculate = async (event) => {
     event.preventDefault();
-    setOpen(true); 
-    console.log(location, radius);
+    setContractArgs([
+      ethers.BigNumber.from(formData.limit || "100000"),
+      formData.region || "BenAss",
+      [
+        ethers.BigNumber.from(formData.longitude || "10"),
+        ethers.BigNumber.from(formData.latitude || "10"),
+        ethers.BigNumber.from(formData.radius || "10000")
+      ],
+      [
+        ethers.BigNumber.from(formData.startPeriod || "1700305970"),
+        ethers.BigNumber.from(formData.endPeriod || "1700306970")
+      ],
+      ethers.BigNumber.from(formData.probability || "900"),
+      formData.poolType,
+      formData.requestFundFromUNICEF !== undefined ? formData.requestFundFromUNICEF : true,
+      ethers.BigNumber.from(formData.premium || "100"),
+      formData.denomination || "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+      formData.acceptedTokens || [
+        "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+        "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+      ]
+    ]);
+                             
+        setOpen(true);                           
+     
   };
+  
+  // Prepare contract write configuration
+  const { config } = usePrepareContractWrite({
+    address: contractAddress,
+    abi: contractABI,
+    functionName: contractFunctionName,
+    args: contractArgs,
+  });
+  console.log('config', config)
 
+  // useContractWrite hook with the prepared config
+  const { write } = useContractWrite(config);
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    // Update contractArgs with the form data
+    setContractArgs([
+      ethers.BigNumber.from(formData.limit || "100000"),
+      formData.region || "BenAss",
+      [
+        ethers.BigNumber.from(formData.longitude || "10"),
+        ethers.BigNumber.from(formData.latitude || "10"),
+        ethers.BigNumber.from(formData.radius || "10000")
+      ],
+      [
+        ethers.BigNumber.from(formData.startPeriod || "1700305970"),
+        ethers.BigNumber.from(formData.endPeriod || "1700306970")
+      ],
+      ethers.BigNumber.from(formData.probability || "900"),
+      formData.poolType,
+      formData.requestFundFromUNICEF !== undefined ? formData.requestFundFromUNICEF : true,
+      ethers.BigNumber.from(formData.premium || "100"),
+      formData.denomination || "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+      formData.acceptedTokens || [
+        "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+        "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+      ]
+    ]);
+  
+    try {
+      if (write) {
+        const tx = await write();
+        console.log('Transaction initiated:', tx);
+      } else {
+        console.error('Contract write function is not available');
+      }
+    } catch (error) {
+      console.error('Error executing contract write:', error);
+    }
+  };
 
   const handleLocationSelect = (selectedLocation) => {
     setLocation(selectedLocation);
   };
+// Update the formData state when 'Amount Needed' input changes
+const handleAmountNeededChange = (event) => {
+  setFormData((prevFormData) => ({
+    ...prevFormData,
+    limit: event.target.value             
+  }));
+};
+
+// Update the formData state when 'Risk' input changes
+const handleRiskChange = (event) => {
+  setFormData((prevFormData) => ({
+    ...prevFormData,
+    poolType: event.target.value
+  }));
+};
+  
   const riskSliderClasses = riskSliderStyles();
   const estimatedPremiums = 10
   const estimatedRisk = 10
@@ -151,6 +681,7 @@ function AddPoolPage() {
                 label="Amount Needed"
                 variant="outlined"
                 className={classes.formField}
+                onChange={handleAmountNeededChange} 
               />
               <TextField
                 required
@@ -159,6 +690,19 @@ function AddPoolPage() {
                 label="Risk"
                 variant="outlined"
                 className={classes.formField}
+               onChange={(e) => setFormData({ ...formData, poolType: e.target.value })}
+
+               
+              />
+              <TextField
+                required
+                fullWidth
+                id="region"
+                label="Region"
+                variant="outlined"
+                className={classes.formField}
+               onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+
               />
               <Typography gutterBottom>Start Date:</Typography> 
       <DatePicker
@@ -207,6 +751,7 @@ function AddPoolPage() {
                 type="submit"
                 color="primary"
                 variant="contained"
+                onClick={handleCalculate}
                 className={classes.formField}
               >
                Calculate
@@ -232,10 +777,22 @@ function AddPoolPage() {
       <Typography variant="caption" className={riskSliderClasses.riskLabel}>
             10% chance estimated risk.
           </Typography>
+
+          <FormControlLabel
+  control={
+    <Checkbox
+      checked={applyForUNFund}
+      onChange={handleCheckboxChange}
+      inputProps={{ 'aria-label': 'Request fund from UN?' }}
+    />
+  }
+  label="Apply for funding from UN?"
+  className={classes.formField}
+/>
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => console.log('Submitting...')}  // replace with your data submission function
+                onClick={handleFormSubmit}  // replace with your data submission function
                 className={classes.formField}
               >
                 Submit
