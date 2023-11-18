@@ -131,3 +131,27 @@ function formatPolicy(policy) {
         usersCommitted: policy.usersCommitted
     };
 }
+
+export async function getCommittedAmounts(provider, policyId, investor) {
+    const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
+    try {
+        const data = await contract.getCommittedAmounts(policyId, investor);
+        return formatCommittedAmounts(data);
+    } catch (error) {
+        console.error("Error fetching committed amounts:", error);
+        return {};
+    }
+}
+
+function formatCommittedAmounts(data) {
+    // Assuming data structure as { totalCommittedInDenomination, tokenAmounts }
+    const { totalCommittedInDenomination, tokenAmounts } = data;
+
+    return {
+        totalCommittedInDenomination: totalCommittedInDenomination.toString(),
+        tokenAmounts: tokenAmounts.map(amount => ({
+            token: amount.token,
+            amount: amount.amount.toString()
+        }))
+    };
+}
