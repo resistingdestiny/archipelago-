@@ -172,6 +172,7 @@ const createQueryString = (product) => {
   queryParams.append('yield', product.yield);
   queryParams.append('utilization', product.utilization);
   queryParams.append('policies', product.policies);
+  queryParams.append('poolType', product.poolType);
   queryParams.append('risk', product.risk);
   queryParams.append('description', product.description);
   queryParams.append('image', product.image);

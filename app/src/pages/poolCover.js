@@ -215,34 +215,15 @@ useEffect(() => {
 const risk = parseInt(policy?.probability);
   const locations = [
     {
-      title: 'Istanbul',
-      latitude: 41.0082,
-      longitude: 28.9784,
-      description: 'The historical and economic hub of Turkey.',
-      streetViewImageUrl: '/path-to-istanbul-street-view.jpg'
+   
+      latitude: policy?.location?.latitude,
+      longitude: policy?.location?.longitude,
+    
     },
-    {
-      title: 'Ankara',
-      latitude: 39.9334,
-      longitude: 32.8597,
-      description: 'The capital city of Turkey, known for its government buildings and museums.',
-      streetViewImageUrl: '/path-to-ankara-street-view.jpg'
-    },
-    {
-      title: 'Cappadocia',
-      latitude: 38.6431,
-      longitude: 34.8289,
-      description: 'Famous for its unique geological formations and hot air balloon flights.',
-      streetViewImageUrl: '/path-to-cappadocia-street-view.jpg'
-    },
-    {
-      title: 'Ephesus',
-      latitude: 37.9398,
-      longitude: 27.3403,
-      description: 'An ancient Greek city with well-preserved ruins and a rich history.',
-      streetViewImageUrl: '/path-to-ephesus-street-view.jpg'
-    }
+  
   ];
+
+  console.log(policy)
 
   const rows = [
     {      
@@ -278,7 +259,7 @@ const risk = parseInt(policy?.probability);
   const handleCloseModal = () => {
     setModalOpen(false);
   };
-  
+  const eligibleAmount = "100"; 
   const earthquakeAlertModal = (
     <Modal
       open={modalOpen}
@@ -338,7 +319,16 @@ const risk = parseInt(policy?.probability);
       <Typography variant="caption" className={classes.riskLabel}>
        {risk} chance of payment in a given year.
       </Typography>
-    </Box>      </Grid>
+    </Box>   
+    {policy && policy.requestFundFromUNICEF && (
+             <><Box sx={{ marginTop: 3, width: '50%' }}><Typography variant="subtitle2" sx={{marginBottom: 2}}className={classes.riskLabel}>
+                    Sponsored By
+                  </Typography><img src='images/unicef.png' alt="UNICEF Logo" style={{ maxWidth: '20%', height: 'auto', marginTop: 5 }} /></Box></>
+                 
+                
+              )}
+    
+       </Grid>
     <Grid item xs={4} style={{ textAlign: 'center' }}>
   <img src='/images/earthquake.png' alt="Product" style={{ maxWidth: '70%', height: 'auto' }} />
 
@@ -365,7 +355,7 @@ const risk = parseInt(policy?.probability);
            Cover Description
           </Typography>
           <Typography variant="body1">
-This cover protects you against major earthquake and can payout before an event happens.          </Typography>
+This cover protects you against {policy?.poolType}s and can payout before an event happens.          </Typography>
         </Box>
 
         <Box className={classes.section}>
@@ -373,7 +363,9 @@ This cover protects you against major earthquake and can payout before an event 
            Location
           </Typography>
           <LinearProgress variant="determinate" value={50} />
-          <MapComponent locations={locations} />
+          {policy && (
+                <MapComponent locations={locations} />
+              )}
          
           <Box mt={4}>
   {/* Activity Table */}
@@ -411,70 +403,35 @@ This cover protects you against major earthquake and can payout before an event 
           </Grid>
           <Grid item xs={12} md={4}>
             <Card className={classes.depositWithdrawCard}>
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                indicatorColor="primary"
-                textColor="inherit"
-                className={classes.tabs}
-              >
-                <Tab label="Deposit" className={classes.tab} />
-                <Tab label="Withdraw" className={classes.tab} />
-              </Tabs>
-              {tabValue === 0 && (
-                <CardContent>
-                  <Typography gutterBottom variant="h6" component="div">
-                    Deposit
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    label="Amount (SAVAX)"
-                    className={classes.input}
-                  />
-                  <Button variant="contained" color="primary" fullWidth>
-                    Connect Wallet
-                  </Button>
-                  <Typography variant="body2" color="textSecondary">
-                    Your deposit will be deployed in the vault's weekly strategy on Friday at 11am UTC
-                  </Typography>
-                </CardContent>
-              )}
-              {tabValue === 1 && (
-                <CardContent>
-                <Typography gutterBottom variant="h6" component="div">
-                  Withdraw
+              <CardContent>
+                <Typography gutterBottom sx={{marginBottom:3}}variant="h6" component="div">
+                  Claim Funds
                 </Typography>
                 <TextField
                   fullWidth
                   variant="outlined"
-                  label="Amount (SAVAX)"
+                  label="Eligible Amount"
+                  value={eligibleAmount}
                   className={classes.input}
+                  InputProps={{
+                    readOnly: true,
+                  }}
                 />
                 <Button
                   variant="contained"
                   color="primary"
                   fullWidth
-                  onClick={() => handleWithdraw(/* pass withdrawal amount here */)}
+                  onClick={() => {/* logic to handle fund claim */}}
+                  className={classes.submitButton}
                 >
-                  Disconnect Wallet
+                  Claim
                 </Button>
-                <Typography variant="body2" color="textSecondary" >
-                  Withdrawals are processed instantly. A withdrawal fee may apply.
-                </Typography>
               </CardContent>
-              )}
             </Card>
-  <Box display="flex" justifyContent="center" alignItems="center" className={classes.section}>
-    <Chip
-      
-      label="Contract:  0x6BF...9FB3"
-      variant="outlined"
-      onClick={() => handleCopyToClipboard('0x6BF...9FB3')}
-      className={classes.contractChip}
-    />
-  </Box>
+           
+           
           </Grid>
+        
         </Grid>
     {earthquakeAlertModal}
 

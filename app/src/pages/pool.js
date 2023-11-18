@@ -28,6 +28,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapComponent from 'components/MapComponent'
 import PerformanceChart from "components/PerformanceComponent";
 import { getPoliciesByType } from 'components/policyViews';
+import { useAccount, useProvider } from 'wagmi';
 
 const useStyles = makeStyles((theme) => ({
   // Add all your styles here
@@ -188,16 +189,10 @@ function PoolPage() {
  const [description, setDescription] = useState('');
  const [tags, setTags] = useState([]);
  const [image, setImage] = useState ('');
- useEffect(() => {
-  // Assuming you have a provider setup, replace with actual provider if different
+ const provider = useProvider(); 
+ const [poolType, setPoolType] = useState('earthquake');
 
-  const poolType = poolName; // Adjust this based on your requirements
-
-  getPoliciesByType( poolType)
-    .then(data => setPoliciesData(data))
-    .catch(error => console.error("Error fetching policies:", error));
-}, [poolName]);
-
+ 
  useEffect(() => {
    // Parse the query string
    const queryParams = new URLSearchParams(window.location.search);
@@ -210,7 +205,8 @@ function PoolPage() {
    setRisk(parseInt(queryParams.get('risk'), 10) || 0);
    setDescription(queryParams.get('description') || '');
    setImage(queryParams.get('image') || '')
-   
+   setImage(queryParams.get('image') || '')
+
    // Extract tags
    const extractedTags = [];
    queryParams.forEach((value, key) => {
@@ -220,6 +216,54 @@ function PoolPage() {
    });
    setTags(extractedTags);
  }, []);
+
+ useEffect(() => {
+
+ getPoliciesByType(provider, poolType)
+   .then(data => setPoliciesData(data))
+   .catch(error => console.error("Error fetching policies:", error));
+}, [poolName]);
+
+console.log(policiesData);
+
+const transactionHistoryTable = (
+  <TableContainer component={Paper}>
+    <Table aria-label="transaction history">
+      <TableHead>
+        <TableRow>
+          <TableCell>Policy ID</TableCell>
+          <TableCell>Pool Type</TableCell>
+          <TableCell align="right">Premium</TableCell>
+          <TableCell align="right">Limit</TableCell>
+          <TableCell align="right">Active</TableCell>
+          {/* Add more columns as needed */}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {policiesData.map((policy, index) => (
+
+          <TableRow key={index}>
+
+            <TableCell>{policy.policyId}</TableCell>
+            <TableCell>{policy.poolType}</TableCell>
+            <TableCell align="right">{policy.premium}</TableCell>
+            <TableCell align="right">{policy.limit}</TableCell>
+            <TableCell align="right">{policy.active ? 'Yes' : 'No'}</TableCell>
+            <TableCell>
+            <Link href={`/poolCover?id=${policy.policyId}`} color="inherit" underline="none">
+              <Button variant="contained" color="primary" size="small">
+                View
+              </Button>
+            </Link>
+          </TableCell>
+          </TableRow>
+
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+);
+
   const locations = [
     {
       title: 'Istanbul',
@@ -370,23 +414,12 @@ function PoolPage() {
             Vault Strategy
           </Typography>
           <Typography variant="body1">
-            The vault earns yield on its deposits through premiums from protecting people from Tsunamis as well as investment income.
+            The vault earns yield on its deposits through premiums from protecting people from {poolType}s as well as investment income.
           </Typography>
         </Box>
-
-        <Box className={classes.section}>
-          <Typography variant="h5" className={classes.title}>
-           Locations
-          </Typography>
-          <LinearProgress variant="determinate" value={50} />
-          <MapComponent locations={locations} />
-          <Box mt={4}>
-
-          <PerformanceChart />
-          </Box>
-          <Box mt={4}>
+        <Box mt={4}>
   {/* Activity Table */}
-  <TableContainer component={Paper} className={classes.table}>
+{/*   <TableContainer component={Paper} className={classes.table}>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -410,8 +443,25 @@ function PoolPage() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
+          <Typography variant="h5" className={classes.title} style={{ marginTop: "20px", marginBottom: "20px" }}>
+          Policies Protected
+        </Typography>
+        {policiesData.length > 0 ? transactionHistoryTable : <Typography>No transactions found.</Typography>}
+
         </Box>
+        <Box className={classes.section}>
+          <Typography variant="h5" className={classes.title}>
+           Locations
+          </Typography>
+          <LinearProgress variant="determinate" value={50} />
+          <MapComponent locations={locations} />
+         
+         
+        <Box mt={4}>
+
+<PerformanceChart />
+</Box>
         </Box>
         <Box>
 
