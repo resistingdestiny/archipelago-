@@ -25,7 +25,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi';
 const provider = new ethers.providers.JsonRpcProvider(
   "https://goerli.gateway.tenderly.co"
-);
+); 
 
 
 
