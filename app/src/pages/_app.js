@@ -14,8 +14,10 @@ import { Helmet } from 'react-helmet'
 
 const { chains, provider } = configureChains(
   [goerli, mainnet, sepolia, polygon, scroll, mantle, arb, base, linea, neon],
-  [alchemyProvider({ apiKey: process.env.ALCHEMY_ID }), publicProvider()]
+  [publicProvider()]
 );
+
+console.log(provider);
 
 const { connectors } = getDefaultWallets({
   appName: "My RainbowKit App",
