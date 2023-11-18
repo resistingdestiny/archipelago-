@@ -95,6 +95,7 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
   },
   card: {
+    minHeight: '600px',
     background: 'rgba(25, 25, 25, 0.9)', // Semi-transparent dark card background
     backdropFilter: 'blur(10px)',
     borderRadius: '15px',
@@ -171,8 +172,29 @@ const allProducts = [
     capacity: '100 STETH',
     yield: '18.60%',
     utilization: '20',
-    description: 'Earn between 10-20% APY protecting the world from Tsnumais',
-    tags: ['Natural Catastrophe', 'Water'], 
+    description: 'Earn between 10-20% APY protecting the world from Tsunamis',
+    tags: ['Natural Catastrophe', 'Water', 'Global'], 
+    image: 'images/tsunami.png'
+  },
+  {
+    name: 'Global Hurricane',
+    balance: '20 STETH',
+    capacity: '100 STETH',
+    yield: '18.60%',
+    utilization: '20',
+    description: 'Earn between 10-20% APY protecting the world from Hurricanes',
+    tags: ['Natural Catastrophe', 'Hurricanes', 'Global'], 
+    image: 'images/hurricane.png'
+  },
+  {
+    name: 'Turkish Earthquake',
+    balance: '20 STETH',
+    capacity: '100 STETH',
+    yield: '18.60%',
+    utilization: '20',
+    description: 'Earn between 10-20% APY protecting Turkey from Earthquakes',
+    tags: ['Natural Catastrophe', 'Earthquake', 'Regional'], 
+    image: 'images/earthquake.png'
   },
 ];
 function DashboardPage(props) {
@@ -269,7 +291,7 @@ function DashboardPage(props) {
                <Card className={classes.card}>
       <CardContent>
       <Box display="flex" justifyContent="center" mb={1} alignItems="center">
-                    <img src='images/hurricane.png' alt="Product" style={{ maxWidth: '50%', height: 'auto' }} />
+                    <img src={product.image} alt="Product" style={{ maxWidth: '50%', height: 'auto' }} />
                   </Box>
         <Typography className={classes.title}>{product.name}</Typography>
         <Typography className={classes.balance}>{product.balance} / {product.capacity}</Typography>
@@ -278,7 +300,7 @@ function DashboardPage(props) {
           value={product.utilization}
           className={classes.progress}
         />
-        <Typography className={classes.yield}>{product.yield}</Typography>
+        <Typography className={classes.yield}>{product.yield} APR</Typography>
         <Typography className={classes.description}>{product.description}</Typography>
         <Box className={classes.progressContainer}>
           <Typography>Current Deposits</Typography>
