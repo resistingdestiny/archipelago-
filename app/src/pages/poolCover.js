@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import {
   Typography,
@@ -28,6 +28,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapComponent from 'components/MapComponent'
 import PerformanceChart from "components/PerformanceComponent";
 import Modal from '@mui/material/Modal';
+import { getPolicyById } from "components/policyViews";
+import { useAccount, useProvider } from 'wagmi';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -196,6 +198,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function PoolPage() {
+  const provider = useProvider(); 
+  const id = 0;
+const [policy, setPolicy] = React.useState(null);
+useEffect(() => {
+  if (id) {
+    getPolicyById(provider, id)
+      .then(data => setPolicy(data))
+      .catch(error => console.error("Error fetching data:", error));
+
+  }
+}, [id, provider]);
+console.log(policy)
   const [modalOpen, setModalOpen] = React.useState(true);
 
   const locations = [
