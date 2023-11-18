@@ -231,6 +231,11 @@ contract InsurancePolicyContract {
         uint256 amount,
         address denomination
     ) private view returns (uint256) {
+        if (token == denomination)
+        {
+            return amount;
+        }
+        
         address[] memory path = new address[](2);
         path[0] = token;
         path[1] = denomination;
@@ -243,8 +248,6 @@ contract InsurancePolicyContract {
             return amount;
         }
     }
-
-    // ... [Previous part of the contract]
 
     struct InsurancePolicyView {
         uint256 limit;
