@@ -6,14 +6,14 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { goerli, mainnet, polygon, sepolia } from "wagmi/chains";
-import { scroll, mantle } from "../util/customChains"
+import { scroll, mantle, arb, base, linea, neon } from "../util/customChains"
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { Helmet } from 'react-helmet'
 
 
 const { chains, provider } = configureChains(
-  [goerli, mainnet, sepolia, polygon, scroll, mantle],
+  [goerli, mainnet, sepolia, polygon, scroll, mantle, arb, base, linea, neon],
   [alchemyProvider({ apiKey: process.env.ALCHEMY_ID }), publicProvider()]
 );
 
