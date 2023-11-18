@@ -26,10 +26,10 @@ import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from
 const provider = new ethers.providers.JsonRpcProvider(
   "https://goerli.gateway.tenderly.co"
 );
-const staking_token_address = "0xc0A7F1B0c9988FbC123f688a521387A51596da47"
 
 
-const contractAddress = '0x682E2dB786aAae2E0D383Fe902EDbd74df5C342D';
+
+const contractAddress = "0x4dFf164AbE5B75018bA8f5b9f7166aCcc4C12406";
   const contractABI = [
     {
       "inputs": [
@@ -452,6 +452,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AddPoolPage() {
+  const [stakingTokenAddress, setStakingTokenAddress] = useState("0xc0A7F1B0c9988FbC123f688a521387A51596da47");
+
   const {data: signer, isError, isLoading} = useSigner();
 
   const [formData, setFormData] = useState({
@@ -511,35 +513,6 @@ const tokens = {
 };
 const [selectedToken, setSelectedToken] = useState('');
 
-  
- /*  const [isClientReady, setIsClientReady] = useState(false);
-  const clientRef = useRef(null); 
-  const initializeStorage = async () => {
-    try {
-      // Create a new client instance
-      const client = await create();
-      clientRef.current = client;
-
-      // Create a new space
-      const space = await client.createSpace('my-awesome-space');
-      // Set the current space
-      await client.setCurrentSpace(space.did());
-
-      // Register the space
-      try {
-        await client.registerSpace('benedict@destinymedia.co.uk', { provider: 'did:web:web3.storage' });
-        setIsClientReady(true);
-      } catch (err) {
-        console.error('Space registration failed: ', err);
-      }
-    } catch (error) {
-      console.error('Error initializing storage:', error);
-    }
-  }; */
-
-  /* useEffect(() => {
-    initializeStorage();
-  }, []); */
 
   
   const classes = useStyles();
@@ -632,7 +605,7 @@ const [selectedToken, setSelectedToken] = useState('');
     let gasAcceptPrice = await signer.getGasPrice();
 
     try {
-      await approveContract.approve("0x682E2dB786aAae2E0D383Fe902EDbd74df5C342D", ethers.BigNumber.from('10000000000000000'),  {
+      await approveContract.approve(contractAddress, ethers.BigNumber.from('10000000000000000'),  {
         gasLimit: 300000,
         gasPrice: gasAcceptPrice.mul(1),
       });  
@@ -640,7 +613,7 @@ const [selectedToken, setSelectedToken] = useState('');
         const tx = await write();
         console.log('Transaction initiated:', tx);
       } else {
-        console.log(config)
+        console.log('death', config)
         console.error('Contract write function is not available');
       }
     } catch (error) {
@@ -666,7 +639,7 @@ const handleAmountNeededChange = (event) => {
 };
 function handleChange(event) {
   setSelectedToken(event.target.value);
-  console.log(event.target.value)
+  setStakingTokenAddress(event.target.value); // Update the staking token address state
   setFormData({ ...formData, denomination: event.target.value });
 }
 
@@ -677,9 +650,9 @@ const handleRiskChange = (event) => {
     poolType: event.target.value
   }));
 };
-const approveInsuranceContract = new ethers.Contract(staking_token_address, ERC20_abi, provider )
+const approveInsuranceContract = new ethers.Contract(stakingTokenAddress, ERC20_abi, provider); 
+  const approveContract = approveInsuranceContract.connect(signer);
 
-const approveContract = approveInsuranceContract.connect(signer)
 
   const riskSliderClasses = riskSliderStyles();
   const estimatedPremiums = 10
