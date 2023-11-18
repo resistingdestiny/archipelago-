@@ -14,7 +14,7 @@ import {
 import Web3 from "web3";
 import { ethers } from "ethers";
 import {approveInsuranceContract} from "../util/contract";
-import {useSigner} from "wagmi";
+import { useSigner, useProvider } from "wagmi";
 import { ERC20_abi } from "../util/contract";
 
 import mapboxgl from 'mapbox-gl';
@@ -23,9 +23,8 @@ import SelectLocationMap from 'components/MapSelect'
 import { DatePicker, LocalizationProvider, MobileDatePicker, DesktopDatePicker, CalendarPicker } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi';
-const provider = new ethers.providers.JsonRpcProvider(
-  "https://goerli.gateway.tenderly.co"
-); 
+
+
 
 
 
@@ -452,10 +451,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AddPoolPage() {
+  const provider = useProvider();
+
   const [stakingTokenAddress, setStakingTokenAddress] = useState("0xc0A7F1B0c9988FbC123f688a521387A51596da47");
 
   const {data: signer, isError, isLoading} = useSigner();
-
+  const [isTransactionError, setIsTransactionError] = useState(false); 
   const [formData, setFormData] = useState({
     limit: "100000",
     region: "BenAss",
@@ -613,8 +614,8 @@ const [selectedToken, setSelectedToken] = useState('');
         const tx = await write();
         console.log('Transaction initiated:', tx);
       } else {
-        console.log('death', config)
         console.error('Contract write function is not available');
+        setIsTransactionError(true);
       }
     } catch (error) {
       console.error('Error executing contract write:', error);
@@ -668,6 +669,13 @@ const approveInsuranceContract = new ethers.Contract(stakingTokenAddress, ERC20_
             <Typography variant="h4" className={classes.title}>
               Add New Pool
             </Typography>
+            {isTransactionError && (
+                <Box color="error.main" mb={2}>
+                  <Typography variant="body1">
+                    Please make sure all form elements are completed correctly 
+                  </Typography>
+                </Box>
+              )}
             <form onSubmit={handleFormSubmit} className={classes.formContainer}>
               <TextField
                 required

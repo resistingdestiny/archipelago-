@@ -280,7 +280,7 @@ function PoolPage() {
 
   <Box display="flex" justifyContent="center" mt={1}>
     <Chip
-      label="NFT:  0x6BF...9FB3"
+      label="Yield: 10%APR"
       variant="outlined"
       onClick={() => handleCopyToClipboard('0x6BF...9FB3')}
       className={classes.contractChip}
