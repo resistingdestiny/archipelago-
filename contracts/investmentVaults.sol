@@ -25,6 +25,7 @@ contract TokenizedVault is IERC4626, ERC20 {
     event InvestedInPolicy(uint256 policyId, uint256 amount);
     event InvestmentCriteriaUpdated(string region, uint256 minPremiumRate, string poolType);
     event FundsCommitted(uint256 policyId, uint256 amount);
+    event FundsReleased(uint256 indexed policyId, uint256 amount);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -77,9 +78,19 @@ contract TokenizedVault is IERC4626, ERC20 {
         asset.transfer(receiver, payout);
     }
 
+    // Function to commit funds to an insurance policy
     function commitFunds(uint256 policyId, uint256 amount) public {
         require(msg.sender == address(insurancePolicyContract), "Unauthorized");
         require(totalAssets() >= amount, "Insufficient assets");
+
+        InsurancePolicyContract.InsurancePolicy memory policy = insurancePolicyContract.insurancePolicies(policyId);
+        require(policy.active, "Policy is not active");
+
+        // Check if investment criteria are met
+        require(keccak256(bytes(policy.region)) == keccak256(bytes(investmentCriteria.region)), "Region criteria not met");
+        require(policy.premium * 1000 / policy.limit >= investmentCriteria.minPremiumRate, "Minimum premium rate criteria not met");
+        require(keccak256(bytes(policy.poolType)) == keccak256(bytes(investmentCriteria.poolType)), "Pool type criteria not met");
+
         totalCommittedFunds += amount;
         emit FundsCommitted(policyId, amount);
     }
