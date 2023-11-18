@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import {
   Typography,
@@ -175,7 +175,40 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function PoolPage() {
+ // Define state variables for each parameter
+ const [poolName, setPoolName] = useState('');
+ const [poolBalance, setPoolBalance] = useState('');
+ const [poolCapacity, setPoolCapacity] = useState('');
+ const [poolYield, setPoolYield] = useState('');
+ const [utilization, setUtilization] = useState('');
+ const [policies, setPolicies] = useState('');
+ const [risk, setRisk] = useState('');
+ const [description, setDescription] = useState('');
+ const [tags, setTags] = useState([]);
+ const [image, setImage] = useState ('');
 
+ useEffect(() => {
+   // Parse the query string
+   const queryParams = new URLSearchParams(window.location.search);
+   setPoolName(queryParams.get('name') || '');
+   setPoolBalance(queryParams.get('balance') || '');
+   setPoolCapacity(queryParams.get('capacity') || '');
+   setPoolYield(queryParams.get('yield') || '');
+   setUtilization(queryParams.get('utilization') || '');
+   setPolicies(queryParams.get('policies') || '');
+   setRisk(parseInt(queryParams.get('risk'), 10) || 0);
+   setDescription(queryParams.get('description') || '');
+   setImage(queryParams.get('image') || '')
+   
+   // Extract tags
+   const extractedTags = [];
+   queryParams.forEach((value, key) => {
+     if (key.startsWith('tag')) {
+       extractedTags.push(value);
+     }
+   });
+   setTags(extractedTags);
+ }, []);
   const locations = [
     {
       title: 'Istanbul',
@@ -244,44 +277,44 @@ function PoolPage() {
     <Grid container spacing={2} alignItems="center">
       <Grid item xs={8}>
         <Typography variant="h4" className={classes.title}>
-          Global Tsunami
+        {poolName}
         </Typography>
         <Typography variant="subtitle1" className={classes.subtitle}>
           Current Vault Deposits
         </Typography>
         <Typography variant="h6">
-          20 SETH
+        {poolBalance}
         </Typography>
         <Typography variant="subtitle1" className={classes.subtitle}>
           Max Vault Capacity
         </Typography>
         <Typography variant="h6">
-          100 SETH
+        {poolCapacity}
         </Typography>
         <Box sx={{ marginTop: 3, width: '50%' }}>
-      <Typography variant="subtitle2" gutterBottom>
-        Risk Level
-      </Typography>
-      <Slider
-        aria-label="Risk Level"
-        defaultValue={10}
-        valueLabelDisplay="auto" 
-        getAriaValueText={() => `10% chance of total loss`}
-        step={null}
-        marks={[{ value: 10, label: '' }]} 
-        className={classes.riskSlider}
-      />
-      <Typography variant="caption" className={classes.riskLabel}>
-        10% chance of total loss of funds in a given year.
-      </Typography>
-    </Box>      </Grid>
+  <Typography variant="subtitle2" gutterBottom>
+    Risk Level
+  </Typography>
+  <Slider
+  aria-label="Risk Level"
+  value={risk} 
+  valueLabelDisplay="auto" 
+  getAriaValueText={() => `${risk}% chance of total loss`}
+  step={null}
+  marks={[{ value: risk, label: '' }]} 
+  className={classes.riskSlider}
+/>
+  <Typography variant="caption" className={classes.riskLabel}>
+    {risk}% chance of total loss of funds in a given year. 
+  </Typography>
+</Box>    </Grid>
     <Grid item xs={4} style={{ textAlign: 'center' }}>
-  <img src='images/hurricane.png' alt="Product" style={{ maxWidth: '70%', height: 'auto' }} />
+  <img src={image} alt="Product" style={{ maxWidth: '70%', height: 'auto' }} />
 
   <Box display="flex" justifyContent="center" mt={1}>
     <Chip
-      label="Yield: 10%APR"
-      variant="outlined"
+  label={`Yield: ${poolYield}APR`}
+  variant="outlined"
       onClick={() => handleCopyToClipboard('0x6BF...9FB3')}
       className={classes.contractChip}
     />

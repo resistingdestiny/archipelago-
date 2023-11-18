@@ -411,10 +411,10 @@ const useStyles = makeStyles((theme) => ({
   },
   mapContainer: {
     height: '200px',
-    marginBottom: theme.spacing(2), // Add space below the map
+    marginBottom: theme.spacing(2), 
   },
   card: {
-    background: 'rgba(25, 25, 25, 0.9)', // Semi-transparent dark card background
+    background: 'rgba(25, 25, 25, 0.9)', 
     backdropFilter: 'blur(10px)',
     borderRadius: '15px',
     color: 'white',
@@ -422,7 +422,7 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     overflow: 'hidden',
     boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-    border: '1px solid #333', // Border for cards
+    border: '1px solid #333', 
     '&::before': {
       content: '""',
       position: 'absolute',

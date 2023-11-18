@@ -174,6 +174,7 @@ const createQueryString = (product) => {
   queryParams.append('policies', product.policies);
   queryParams.append('risk', product.risk);
   queryParams.append('description', product.description);
+  queryParams.append('image', product.image);
   product.tags.forEach((tag, index) => queryParams.append(`tag${index}`, tag));
   return queryParams.toString();
 };
