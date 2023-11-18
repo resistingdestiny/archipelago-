@@ -231,11 +231,10 @@ contract InsurancePolicyContract {
         uint256 amount,
         address denomination
     ) private view returns (uint256) {
-        if (token == denomination)
-        {
+        if (token == denomination) {
             return amount;
         }
-        
+
         address[] memory path = new address[](2);
         path[0] = token;
         path[1] = denomination;
@@ -484,5 +483,38 @@ contract InsurancePolicyContract {
             }
         }
         return regionPolicies;
+    }
+
+    // Struct to hold committed amounts in individual tokens
+    struct CommittedAmounts {
+        address token;
+        uint256 amount;
+    }
+
+    function getCommittedAmounts(uint256 policyId, address investor)
+        public
+        view
+        returns (
+            uint256 totalCommittedInDenomination,
+            CommittedAmounts[] memory tokenAmounts
+        )
+    {
+        require(policyId < nextPolicyId, "Invalid policy ID");
+
+        InsurancePolicy storage policy = insurancePolicies[policyId];
+        totalCommittedInDenomination = policy.userFundsCommittedDenominated[
+            investor
+        ];
+
+        uint256 tokenCount = policy.acceptedTokens.length;
+        tokenAmounts = new CommittedAmounts[](tokenCount);
+
+        for (uint256 i = 0; i < tokenCount; i++) {
+            address token = policy.acceptedTokens[i];
+            uint256 amount = policy.userFundsCommitted[investor][token];
+            if (amount > 0) {
+                tokenAmounts[i] = CommittedAmounts(token, amount);
+            }
+        }
     }
 }

@@ -1,0 +1,56 @@
+Approve token
+
+call to ERC20.balanceOf
+CALL
+[call]from: 0xf2B719136656BF21c2B2a255F586afa34102b71dto: ERC20.balanceOf(address)data: 0x70a...2b71d
+from	0xf2B719136656BF21c2B2a255F586afa34102b71d
+to	ERC20.balanceOf(address) 0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4
+input	0x70a...2b71d
+decoded input	{
+	"address account": "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+}
+decoded output	{
+	"0": "uint256: 120000000000000000000000000"
+}
+logs	[]
+transact to ERC20.approve pending ... 
+
+
+Setup Policy
+
+
+{
+	"uint256 _limit": "10000",
+	"string _region": "BensARRRRSE",
+	"tuple _location": [
+		"10",
+		"10",
+		"100"
+	],
+	"tuple _coverPeriod": [
+		"1700305970",
+		"1700306970"
+	],
+	"uint256 _probability": "90",
+	"string _poolType": "Flood",
+	"bool _requestFundFromUNICEF": true,
+	"uint256 _premium": "1",
+	"address _denomination": "0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4",
+	"address[] _acceptedTokens": [
+		"0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4"
+	]
+}
+
+
+COMMIT funds
+
+{
+	"uint256 policyId": "0",
+	"address token": "0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4",
+	"uint256 amount": "12"
+}
+
+Finish policy (supply id)
+{
+	"uint256 policyId": "0"
+}
