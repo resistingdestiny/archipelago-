@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
-import Link from "next/link";
 import Button from "@mui/material/Button";
 
 import Box from "@mui/material/Box";
@@ -14,6 +13,12 @@ import Typography from "@mui/material/Typography";
 import Section from "components/Section";
 import { useTheme } from "@mui/styles";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import Badge from '@mui/material/Badge';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Link from 'next/link';
+
 
 
 function Navbar2(props) {
@@ -21,7 +26,12 @@ function Navbar2(props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuState, setMenuState] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: 'Predicted loss', read: false },
 
+    { id: 3, message: 'Cover activated', read: true },
+  ]);
   // Use inverted logo if specified
   // and we are in dark mode
   const logo =
@@ -29,7 +39,22 @@ function Navbar2(props) {
       ? props.logoInverted
       : props.logo;
 
-
+      const handleNotificationClick = (event) => {
+        setAnchorEl(event.currentTarget);
+      };
+      
+      const handleNotificationClose = () => {
+        setAnchorEl(null);
+      };
+      
+      const handleMarkAsRead = (notificationId, message) => {
+        setNotifications(notifications.map((notification) =>
+          notification.id === notificationId
+            ? { ...notification, read: true }
+            : notification
+        ));
+      
+      };
 
   return (
     <Section bgColor={props.color} size="auto">
@@ -81,6 +106,42 @@ function Navbar2(props) {
 
            
             </Box>
+            <IconButton
+    color="inherit"
+    onClick={handleNotificationClick}
+  >
+    <Badge
+      badgeContent={notifications.filter((notification) => !notification.read).length}
+      color="error"
+    >
+      <NotificationsIcon />
+    </Badge>
+  </IconButton>
+  <Menu
+    anchorEl={anchorEl}
+    open={Boolean(anchorEl)}
+    onClose={handleNotificationClose}
+  >
+   {notifications.map((notification) => (
+  <MenuItem
+    key={notification.id}
+    onClick={() => handleMarkAsRead(notification.id, notification.message)}
+    sx={{ backgroundColor: notification.read ? "transparent" : theme.palette.action.selected }}
+  >
+    {notification.message === 'Predicted loss' ? (
+      <Link href="/poolCover" passHref>
+        <Typography component="a" style={{ textDecoration: 'none', color: 'inherit' }}>
+          {notification.message}
+        </Typography>
+      </Link>
+    ) : (
+      <Typography>
+        {notification.message}
+      </Typography>
+    )}
+  </MenuItem>
+))}
+  </Menu>
           </Toolbar>
         </Container>
       </AppBar>
