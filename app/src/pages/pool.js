@@ -21,6 +21,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Slider,
 } from "@mui/material";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -67,6 +68,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '1.5rem',
     fontWeight: 700,
     color: '#ffffff',
+    marginBottom: theme.spacing(3),
   },
   subtitle: {
     color: theme.palette.grey[500],
@@ -140,6 +142,36 @@ const useStyles = makeStyles((theme) => ({
   tabs: {
     borderBottom: '1px solid rgba(255, 255, 255, 0.23)',
   },
+  riskSlider: {
+    height: 8,
+    borderRadius: 4,
+    '& .MuiSlider-rail': {
+      opacity: 0.5,
+      backgroundColor: '#bfbfbf', // This is the background color
+    },
+    '& .MuiSlider-track': {
+      border: 'none',
+      borderRadius: 4,
+      background: 'linear-gradient(to right, #00e676, #ff1744)', // Gradient from green to red
+    },
+    '& .MuiSlider-thumb': {
+      height: 24,
+      width: 24,
+      backgroundColor: '#fff',
+      border: '2px solid currentColor',
+      '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+        boxShadow: 'inherit',
+      },
+      '&:before': {
+        display: 'none',
+      },
+    },
+  },
+  riskLabel: {
+    display: 'block',
+    textAlign: 'left',
+    marginTop: theme.spacing(1),
+  },
 }));
 
 function PoolPage() {
@@ -208,27 +240,56 @@ function PoolPage() {
       <Container maxWidth="lg">
       {/* Vault Card */}
       <Card className={classes.card}>
-          <CardContent>
-            <Typography variant="h4" className={classes.title}>
-              T-SAVAX-C
-            </Typography>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Chip label="COVERED CALL" className={classes.chip} />
-              <Chip label="U2" className={classes.chip} />
-            </Box>
-            <Typography variant="subtitle1" className={classes.subtitle}>
-              Current Vault Deposits
-            </Typography>
-            <Typography variant="h6">
-              6.258, 13 SAVAX
-            </Typography>
-            <Typography variant="subtitle1" className={classes.subtitle}>
-              Max Vault Capacity
-            </Typography>
-            <Typography variant="h6">
-              200K SAVAX
-            </Typography>
-          </CardContent>
+      <CardContent>
+    <Grid container spacing={2} alignItems="center">
+      <Grid item xs={8}>
+        <Typography variant="h4" className={classes.title}>
+          Global Tsunami
+        </Typography>
+        <Typography variant="subtitle1" className={classes.subtitle}>
+          Current Vault Deposits
+        </Typography>
+        <Typography variant="h6">
+          20 SETH
+        </Typography>
+        <Typography variant="subtitle1" className={classes.subtitle}>
+          Max Vault Capacity
+        </Typography>
+        <Typography variant="h6">
+          100 SETH
+        </Typography>
+        <Box sx={{ marginTop: 3, width: '50%' }}>
+      <Typography variant="subtitle2" gutterBottom>
+        Risk Level
+      </Typography>
+      <Slider
+        aria-label="Risk Level"
+        defaultValue={10}
+        valueLabelDisplay="auto" 
+        getAriaValueText={() => `10% chance of total loss`}
+        step={null}
+        marks={[{ value: 10, label: '' }]} 
+        className={classes.riskSlider}
+      />
+      <Typography variant="caption" className={classes.riskLabel}>
+        10% chance of total loss of funds in a given year.
+      </Typography>
+    </Box>      </Grid>
+    <Grid item xs={4} style={{ textAlign: 'center' }}>
+  <img src='/images/hurricane.png' alt="Product" style={{ maxWidth: '70%', height: 'auto' }} />
+
+  <Box display="flex" justifyContent="center" mt={1}>
+    <Chip
+      label="NFT:  0x6BF...9FB3"
+      variant="outlined"
+      onClick={() => handleCopyToClipboard('0x6BF...9FB3')}
+      className={classes.contractChip}
+    />
+  </Box>
+</Grid>
+    </Grid>
+  </CardContent>
+
         </Card>
        
 
@@ -240,7 +301,7 @@ function PoolPage() {
             Vault Strategy
           </Typography>
           <Typography variant="body1">
-            The vault earns yield on its SAVAX deposits by running a weekly automated SAVAX covered call strategy where it stakes its SAVAX deposits in Benqi and then uses its SAVAX to collateralize weekly out-of-money SAVAX call options. The yield earned from both the covered call strategy and the SAVAX staking rewards are reinvested weekly, effectively compounding the yields for depositors over time.
+            The vault earns yield on its deposits through premiums from protecting people from Tsunamis as well as investment income.
           </Typography>
         </Box>
 

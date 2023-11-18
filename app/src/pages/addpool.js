@@ -8,12 +8,43 @@ import {
   TextField,
   Button,
   Slider,
-  Typography, Checkbox, FormControlLabel, FormGroup
+  Typography, Checkbox, FormControlLabel, FormGroup,
+  Collapse,  Select, MenuItem,
 } from '@mui/material';
+
+
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import SelectLocationMap from 'components/MapSelect'
+import { DatePicker, LocalizationProvider, MobileDatePicker, DesktopDatePicker, CalendarPicker } from '@mui/lab';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
 
+const riskSliderStyles = makeStyles((theme) => ({
+  riskSlider: {
+    height: 8,
+    borderRadius: 4,
+    '& .MuiSlider-rail': {
+      opacity: 0.5,
+      backgroundColor: '#bfbfbf',
+    },
+    '& .MuiSlider-track': {
+      border: 'none',
+      borderRadius: 4,
+      background: 'linear-gradient(to right, #00e676, #ff1744)', // Correct gradient
+    },
+    '& .MuiSlider-thumb': {
+      height: 24,
+      width: 24,
+      backgroundColor: '#fff',
+      boxShadow: 'inherit',
+    },
+  },
+  riskLabel: {
+    display: 'block',
+    textAlign: 'left',
+    marginTop: theme.spacing(1),
+  },
+}));
 
 const useStyles = makeStyles((theme) => ({
   submitButton: {
@@ -65,7 +96,10 @@ const useStyles = makeStyles((theme) => ({
 function AddPoolPage() {
   const classes = useStyles();
   const [applyForUNFund, setApplyForUNFund] = useState(false);
-
+  const [open, setOpen] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [token, setToken] = useState("");
   const mapContainerRef = useRef(null);
   const [location, setLocation] = useState(null);
   const [radius, setRadius] = useState(5);
@@ -73,21 +107,35 @@ function AddPoolPage() {
     setApplyForUNFund(event.target.checked);
   };
 
-
+  const handleTokenChange = (event) => {
+    setToken(event.target.value);
+  };
+  const handleStartDateChange = (newStartDate) => {
+    setStartDate(newStartDate);
+  };
+  const handleEndDateChange = (newEndDate) => {
+    setEndDate(newEndDate);
+  };
   const handleRadiusChange = (event, newValue) => {
     setRadius(newValue);
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
+    setOpen(true); 
     console.log(location, radius);
   };
+
 
   const handleLocationSelect = (selectedLocation) => {
     setLocation(selectedLocation);
   };
-
+  const riskSliderClasses = riskSliderStyles();
+  const estimatedPremiums = 10
+  const estimatedRisk = 10
   return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+
     <Box className={classes.pageContainer}>
       <Container maxWidth="md">
         <Card className={classes.card}>
@@ -112,7 +160,33 @@ function AddPoolPage() {
                 variant="outlined"
                 className={classes.formField}
               />
-              <Typography gutterBottom>Radius (km): {radius}</Typography>
+              <Typography gutterBottom>Start Date:</Typography> 
+      <DatePicker
+        value={startDate}
+        onChange={(newStartDate) => handleStartDateChange(newStartDate)}
+        renderInput={(props) => <TextField {...props} />}
+      />
+      <Typography gutterBottom>End Date:</Typography> 
+      <DatePicker
+        value={endDate}
+        onChange={(newEndDate) => handleEndDateChange(newEndDate)}
+        renderInput={(props) => <TextField {...props} />}
+      />
+      <Typography gutterBottom>Select Token for Collateral:</Typography> 
+      <Select
+        labelId="token-select-label"
+        id="token-select"
+        value={token}
+        variant="outlined"
+        onChange={handleTokenChange}
+      >
+        <MenuItem value={'ETH'}>ETH</MenuItem>
+        <MenuItem value={'BTC'}>BTC</MenuItem>
+        <MenuItem value={'DOT'}>DOT</MenuItem>
+        <MenuItem value={'ADA'}>ADA</MenuItem>
+      </Select>
+      <Typography gutterBottom>Radius (km): {radius}</Typography>
+
               <Slider
                 value={radius}
                 onChange={handleRadiusChange}
@@ -135,14 +209,47 @@ function AddPoolPage() {
                 variant="contained"
                 className={classes.formField}
               >
-                Submit Pool
+               Calculate
               </Button>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+              <Typography variant="subtitle1">
+                Estimated Premiums: {estimatedPremiums}
+              </Typography>
+              <Typography variant="subtitle1">
+                Estimated Risk: {estimatedRisk}
+              </Typography>
+              
+              <Slider
+            aria-label="Estimated Risk Level"
+            defaultValue={10}
+            value={10}
+            aria-labelledby="risk-slider"
+            valueLabelDisplay="auto"
+            step={null}
+            marks={[{ value: 10, label: '' }]} 
+            className={riskSliderClasses.riskSlider} 
+          />
+      <Typography variant="caption" className={riskSliderClasses.riskLabel}>
+            10% chance estimated risk.
+          </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => console.log('Submitting...')}  // replace with your data submission function
+                className={classes.formField}
+              >
+                Submit
+              </Button>
+            </Collapse>
             </form>
           </CardContent>
         </Card>
       </Container>
     </Box>
+    </LocalizationProvider>
+
   );
+
 }
 
 export default AddPoolPage;

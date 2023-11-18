@@ -115,6 +115,10 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
       pointerEvents: 'none',
     },
+    transition: 'box-shadow 0.3s', // Smooth transition for the glow effect
+    '&:hover': {
+      boxShadow: `0 0 10px 0 rgba(140, 58, 255, 0.5), 0 0 20px 0 rgba(140, 58, 255, 0.3), 0 0 30px 15px rgba(140, 58, 255, 0.2)`, // Glowing purple shadow
+    },
   },
   cardContent: {
     zIndex: 2,
@@ -162,14 +166,14 @@ const useStyles = makeStyles((theme) => ({
 
 const allProducts = [
   {
-    name: 'R-STETH-EARN',
-    balance: '870.04 STETH',
-    capacity: '4,000.00 STETH',
-    yield: '68.60%',
-    description: 'Earn up to 68.60% APY with a principal protected vault strategy',
-    tags: ['COVERED CALL', 'U2'], // Example tags array
+    name: 'Global Tsunami',
+    balance: '20 STETH',
+    capacity: '100 STETH',
+    yield: '18.60%',
+    utilization: '20',
+    description: 'Earn between 10-20% APY protecting the world from Tsnumais',
+    tags: ['Natural Catastrophe', 'Water'], 
   },
-  // ... other products
 ];
 function DashboardPage(props) {
   const classes = useStyles();
@@ -260,8 +264,13 @@ function DashboardPage(props) {
         <Grid container spacing={4}>
           {products.map((product, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
+                     
+
                <Card className={classes.card}>
       <CardContent>
+      <Box display="flex" justifyContent="center" mb={1} alignItems="center">
+                    <img src='images/hurricane.png' alt="Product" style={{ maxWidth: '50%', height: 'auto' }} />
+                  </Box>
         <Typography className={classes.title}>{product.name}</Typography>
         <Typography className={classes.balance}>{product.balance} / {product.capacity}</Typography>
         <LinearProgress
@@ -296,7 +305,7 @@ function DashboardPage(props) {
             className={classes.ctaButton}
             href="/pool"
           >
-            Get Started
+            View
           </Button>
         </Box>
       </CardContent>

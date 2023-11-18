@@ -12,6 +12,18 @@ import {
   Tabs,
 } from "@mui/material";
 import PerformanceChart from "components/PerformanceComponent";
+import { useBalance } from 'wagmi';
+import { useAccount } from 'wagmi'
+ 
+function App() {
+  const { address, isConnecting, isDisconnected } = useAccount()
+  const { data, isError, isLoading } = useBalance({
+    address: address,
+  });
+  if (isConnecting) return <div>Connecting…</div>
+  if (isDisconnected) return <div>Disconnected</div>
+  return <div>{address}</div>
+}
 
 const useStyles = makeStyles((theme) => ({
   pageContainer: {
@@ -41,10 +53,13 @@ const useStyles = makeStyles((theme) => ({
   },
   // Add other styles as needed
 }));
-
 function PortfolioPage() {
   const classes = useStyles();
+  const { address, isConnecting, isDisconnected } = useAccount();
 
+  const { data, isError, isLoading } = useBalance({
+    address: address,
+  });
   return (
     <Box className={classes.pageContainer}>
       <Container maxWidth="lg">
@@ -59,13 +74,16 @@ function PortfolioPage() {
           <Grid item xs={12} md={4}>
             <Card className={classes.card}>
               <CardContent>
-                {/* Content for Balances */}
                 <Typography variant="h6">Balances</Typography>
-                {/* Placeholder for balance content */}
-                <Typography>---</Typography>
-                <Button variant="contained" className={classes.button}>
-                  Connect your wallet
-                </Button>
+                {isLoading ? <div>Fetching balance…</div> : null}
+                {isError ? <div>Error fetching balance</div> : null}
+                {data ? <Typography> {data.formatted} {data.symbol}</Typography> : null}
+                
+                {isDisconnected ? (
+                    <Button variant="contained" className={classes.button}>
+                      Connect your wallet
+                    </Button>
+                ) : null}
               </CardContent>
             </Card>
           </Grid>
