@@ -374,7 +374,9 @@ const contractAddress = '0x682E2dB786aAae2E0D383Fe902EDbd74df5C342D';
   
     
   const contractFunctionName = 'createInsurancePolicy'; // Function to call
-
+  const toIntegerLatLong = (num) => {
+    return Math.round(num * 1e6); // Multiply by 1e6 to convert to an integer
+  };
 const riskSliderStyles = makeStyles((theme) => ({
   riskSlider: {
     height: 8,
@@ -462,7 +464,7 @@ function AddPoolPage() {
     endPeriod: "1700306970",
     probability: "900",
     poolType: "Flood",
-    requestFundFromUNICEF: true,
+    requestFundFromUNICEF: false,
     premium: "100",
     denomination: "0xf2B719136656BF21c2B2a255F586afa34102b71d",
     acceptedTokens: [
@@ -477,8 +479,8 @@ function AddPoolPage() {
       ethers.BigNumber.from(formData._limit || "100000"),
       formData._region || "BenAss",
       [
-        ethers.BigNumber.from(formData._location?.longitude || "10"),
-        ethers.BigNumber.from(formData._location?.latitude || "10"),
+        ethers.BigNumber.from(toIntegerLatLong(formData.longitude) || "10"),
+        ethers.BigNumber.from(toIntegerLatLong(formData.latitude) || "10"),
         ethers.BigNumber.from(formData._location?.radius || "10000")
       ],
       [
@@ -576,17 +578,21 @@ const [selectedToken, setSelectedToken] = useState('');
   };
   const handleRadiusChange = (event, newValue) => {
     setRadius(newValue);
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      radius: newValue.toString()
+    }));
   };
-  
+
   const handleCalculate = async (event) => {
     event.preventDefault();
     setContractArgs([
-      ethers.BigNumber.from(formData.limit || "100000"),
-      formData.region || "BenAss",
+      ethers.BigNumber.from(formData.limit),
+      formData.region ,
       [
-        ethers.BigNumber.from(formData.longitude || "10"),
-        ethers.BigNumber.from(formData.latitude || "10"),
-        ethers.BigNumber.from(formData.radius || "10000")
+        ethers.BigNumber.from(toIntegerLatLong(formData.longitude)),
+        ethers.BigNumber.from(toIntegerLatLong(formData.latitude)),
+        ethers.BigNumber.from(formData.radius )
       ],
       [
         ethers.BigNumber.from(formData.startPeriod || "1700305970"),
@@ -622,28 +628,7 @@ const [selectedToken, setSelectedToken] = useState('');
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     // Update contractArgs with the form data
-    setContractArgs([
-      ethers.BigNumber.from(formData.limit || "100000"),
-      formData.region || "BenAss",
-      [
-        ethers.BigNumber.from(formData.longitude || "10"),
-        ethers.BigNumber.from(formData.latitude || "10"),
-        ethers.BigNumber.from(formData.radius || "10000")
-      ],
-      [
-        ethers.BigNumber.from(formData.startPeriod || "1700305970"),
-        ethers.BigNumber.from(formData.endPeriod || "1700306970")
-      ],
-      ethers.BigNumber.from(formData.probability || "900"),
-      formData.poolType,
-      formData.requestFundFromUNICEF !== undefined ? formData.requestFundFromUNICEF : true,
-      ethers.BigNumber.from(formData.premium || "100"),
-      formData.denomination || "0xf2B719136656BF21c2B2a255F586afa34102b71d",
-      formData.acceptedTokens || [
-        "0xf2B719136656BF21c2B2a255F586afa34102b71d",
-        "0xf2B719136656BF21c2B2a255F586afa34102b71d"
-      ]
-    ]);
+   
     let gasAcceptPrice = await signer.getGasPrice();
 
     try {
@@ -655,6 +640,7 @@ const [selectedToken, setSelectedToken] = useState('');
         const tx = await write();
         console.log('Transaction initiated:', tx);
       } else {
+        console.log(config)
         console.error('Contract write function is not available');
       }
     } catch (error) {
@@ -664,6 +650,12 @@ const [selectedToken, setSelectedToken] = useState('');
 
   const handleLocationSelect = (selectedLocation) => {
     setLocation(selectedLocation);
+  
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      longitude: selectedLocation.longitude.toString(),
+      latitude: selectedLocation.latitude.toString()
+    }));
   };
 // Update the formData state when 'Amount Needed' input changes
 const handleAmountNeededChange = (event) => {
@@ -778,7 +770,17 @@ const approveContract = approveInsuranceContract.connect(signer)
                 radius={radius}
               />
                 </div> 
-             
+                <FormControlLabel
+  control={
+    <Checkbox
+      checked={applyForUNFund}
+      onChange={handleCheckboxChange}
+      inputProps={{ 'aria-label': 'Request fund from UN?' }}
+    />
+  }
+  label="Apply for funding from UN?"
+  className={classes.formField}
+/>
               <Button
                 type="submit"
                 color="primary"
@@ -810,17 +812,7 @@ const approveContract = approveInsuranceContract.connect(signer)
             10% chance estimated risk.
           </Typography>
 
-          <FormControlLabel
-  control={
-    <Checkbox
-      checked={applyForUNFund}
-      onChange={handleCheckboxChange}
-      inputProps={{ 'aria-label': 'Request fund from UN?' }}
-    />
-  }
-  label="Apply for funding from UN?"
-  className={classes.formField}
-/>
+         
               <Button
                 variant="contained"
                 color="secondary"
