@@ -27,6 +27,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapComponent from 'components/MapComponent'
 import PerformanceChart from "components/PerformanceComponent";
+import { getPoliciesByType } from 'components/policyViews';
 
 const useStyles = makeStyles((theme) => ({
   // Add all your styles here
@@ -176,6 +177,7 @@ const useStyles = makeStyles((theme) => ({
 
 function PoolPage() {
  // Define state variables for each parameter
+ const [policiesData, setPoliciesData] = useState([]); 
  const [poolName, setPoolName] = useState('');
  const [poolBalance, setPoolBalance] = useState('');
  const [poolCapacity, setPoolCapacity] = useState('');
@@ -186,6 +188,15 @@ function PoolPage() {
  const [description, setDescription] = useState('');
  const [tags, setTags] = useState([]);
  const [image, setImage] = useState ('');
+ useEffect(() => {
+  // Assuming you have a provider setup, replace with actual provider if different
+
+  const poolType = poolName; // Adjust this based on your requirements
+
+  getPoliciesByType( poolType)
+    .then(data => setPoliciesData(data))
+    .catch(error => console.error("Error fetching policies:", error));
+}, [poolName]);
 
  useEffect(() => {
    // Parse the query string
@@ -246,6 +257,30 @@ function PoolPage() {
     // ... more rows
   ];
   
+  const policiesTable = (
+    <TableContainer component={Paper}>
+      <Table aria-label="policies table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Policy ID</TableCell>
+            <TableCell align="right">Details</TableCell>
+            {/* Add more columns as needed */}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {policiesData.map((policy, index) => (
+            <TableRow key={index}>
+              <TableCell component="th" scope="row">
+                {policy.id} {/* Adjust based on your policy object structure */}
+              </TableCell>
+              <TableCell align="right">{policy.details}</TableCell>
+              {/* Add more cells as needed */}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
   const classes = useStyles();
   const [tabValue, setTabValue] = React.useState(0);
   const getAmountStyle = (type) => {
@@ -447,6 +482,9 @@ function PoolPage() {
       className={classes.contractChip}
     />
   </Box>
+
+  {policiesTable}
+
           </Grid>
         </Grid>
       </Container>

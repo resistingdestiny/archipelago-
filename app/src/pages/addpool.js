@@ -28,7 +28,7 @@ import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from
 
 
 
-const contractAddress = "0x4dFf164AbE5B75018bA8f5b9f7166aCcc4C12406";
+const contractAddress = "0xcF1a6099eeb2AB657b7dB39042782ed041E0CF3A";
   const contractABI = [
     {
       "inputs": [
