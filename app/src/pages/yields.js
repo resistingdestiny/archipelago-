@@ -95,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
   },
   card: {
-    minHeight: '600px',
+    minHeight: '500px',
     background: 'rgba(25, 25, 25, 0.9)', // Semi-transparent dark card background
     backdropFilter: 'blur(10px)',
     borderRadius: '15px',
@@ -164,35 +164,54 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+const createQueryString = (product) => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('name', product.name);
+  queryParams.append('balance', product.balance);
+  queryParams.append('capacity', product.capacity);
+  queryParams.append('yield', product.yield);
+  queryParams.append('utilization', product.utilization);
+  queryParams.append('policies', product.policies);
+  queryParams.append('risk', product.risk);
+  queryParams.append('description', product.description);
+  product.tags.forEach((tag, index) => queryParams.append(`tag${index}`, tag));
+  return queryParams.toString();
+};
 
 const allProducts = [
   {
     name: 'Global Tsunami',
-    balance: '20 STETH',
-    capacity: '100 STETH',
+    balance: '20 GETH',
+    capacity: '100 GETH',
     yield: '18.60%',
     utilization: '20',
+    policies: '7',
+    risk: 10, 
     description: 'Earn between 10-20% APY protecting the world from Tsunamis',
     tags: ['Natural Catastrophe', 'Water', 'Global'], 
     image: 'images/tsunami.png'
   },
   {
     name: 'Global Hurricane',
-    balance: '20 STETH',
-    capacity: '100 STETH',
-    yield: '18.60%',
+    balance: '20 GETH',
+    capacity: '100 GETH',
+    yield: '8%',
     utilization: '20',
-    description: 'Earn between 10-20% APY protecting the world from Hurricanes',
+    policies: '9',
+    risk: 20,
+    description: 'Earn between 5-10% APY protecting the world from Hurricanes',
     tags: ['Natural Catastrophe', 'Hurricanes', 'Global'], 
     image: 'images/hurricane.png'
   },
   {
     name: 'Turkish Earthquake',
-    balance: '20 STETH',
-    capacity: '100 STETH',
-    yield: '18.60%',
+    balance: '20 GETH',
+    capacity: '100 GETH',
+    yield: '6%',
     utilization: '20',
-    description: 'Earn between 10-20% APY protecting Turkey from Earthquakes',
+    policies: '11',
+    risk: 30,
+    description: 'Earn between 5-10% APY protecting Turkey from Earthquakes',
     tags: ['Natural Catastrophe', 'Earthquake', 'Regional'], 
     image: 'images/earthquake.png'
   },
@@ -219,6 +238,11 @@ function DashboardPage(props) {
     filterProducts(strategy, asset, event.target.value);
   };
 
+  const parseYield = (yieldStr) => {
+    return parseFloat(yieldStr.replace('%', ''));
+  };
+
+ 
   const filterProducts = (strategy, asset, sortBy) => {
    
     let filtered = allProducts;
@@ -227,6 +251,11 @@ function DashboardPage(props) {
     }
     if (asset) {
       filtered = filtered.filter(product => product.asset === asset);
+    }
+    if (sortBy === 'HighestYield') {
+      filtered.sort((a, b) => parseYield(b.yield) - parseYield(a.yield));
+    } else if (sortBy === 'LowestRisk') {
+      filtered.sort((a, b) => a.risk - b.risk); // Assuming 'risk' is a numeric value
     }
 
 
@@ -238,32 +267,20 @@ function DashboardPage(props) {
       <Container maxWidth="lg">
       <Box className={classes.filterContainer}>
         <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel>Strategy</InputLabel>
+          <InputLabel>Number of policies</InputLabel>
           <Select
             value={strategy}
             onChange={(e) => setStrategy(e.target.value)}
             label="Strategy"
           >
            
-            <MenuItem value="Strategy1">Strategy 1</MenuItem>
-            <MenuItem value="Strategy2">Strategy 2</MenuItem>
+            <MenuItem value="Strategy1">Highest</MenuItem>
+            <MenuItem value="Strategy2">Lowest</MenuItem>
             {/* ... other strategies */}
           </Select>
         </FormControl>
 
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel>Deposit Asset</InputLabel>
-          <Select
-            value={asset}
-            onChange={(e) => setAsset(e.target.value)}
-            label="Deposit Asset"
-          >
-          
-            <MenuItem value="Asset1">Asset 1</MenuItem>
-            <MenuItem value="Asset2">Asset 2</MenuItem>
-            {/* ... other assets */}
-          </Select>
-        </FormControl>
+    
 
         <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel>Sort By</InputLabel>
@@ -303,13 +320,12 @@ function DashboardPage(props) {
         <Typography className={classes.yield}>{product.yield} APR</Typography>
         <Typography className={classes.description}>{product.description}</Typography>
         <Box className={classes.progressContainer}>
-          <Typography>Current Deposits</Typography>
-          <Typography>{product.currentDeposits}</Typography>
+          <Typography>Policies:</Typography>
+          <Typography>{product.policies}</Typography>
+          <Typography>Risk:</Typography>
+          <Typography>{product.risk}%</Typography>
         </Box>
-        <Box className={classes.progressContainer}>
-          <Typography>Max Capacity</Typography>
-          <Typography>{product.maxCapacity}</Typography>
-        </Box>
+      
         <Box mt={2}>
           {product.tags.map((tag) => (
             <Chip
@@ -321,11 +337,12 @@ function DashboardPage(props) {
             />
           ))}
         </Box>
-        <Box mt={2} className={classes.button}> 
+        <Box mt={3} className={classes.button}> 
           <Button
             variant="contained" 
             className={classes.ctaButton}
-            href="/pool"
+            href={`/pool?${createQueryString(product)}`}
+
           >
             View
           </Button>

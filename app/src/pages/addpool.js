@@ -451,7 +451,6 @@ const useStyles = makeStyles((theme) => ({
 
 function AddPoolPage() {
   const provider = useProvider();
-
   const [stakingTokenAddress, setStakingTokenAddress] = useState("0xc0A7F1B0c9988FbC123f688a521387A51596da47");
 
   const {data: signer, isError, isLoading} = useSigner();
