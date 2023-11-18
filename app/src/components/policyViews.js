@@ -104,6 +104,26 @@ export async function getPoliciesByType(provider, poolType) {
     }
 }
 
+export async function getPolicyById(provider, policyId) {
+    const contract = new ethers.Contract(insurancePolicyAddress, insurancePolicyABI, provider);
+    try {
+      const policies = await contract.insurancePolicies(policyId);
+
+      // Add policyId to each policy before formatting
+      const formattedPolicies = policies.map(policy => {
+        // Include policyId in the policy object before formatting
+        const policyWithId = {...policy, policyId};
+        return formatPolicy(policyWithId); // Format the policy with the policyId included
+      });
+
+      return formattedPolicies;
+    } catch (error) {
+      console.error("Error fetching policies by id:", error);
+      return [];
+    }
+}
+
+
 function formatPolicy(policy) {
     return {
         policyId: policy.policyId.toString(),
