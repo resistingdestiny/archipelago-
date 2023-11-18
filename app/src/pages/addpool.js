@@ -7,10 +7,13 @@ import {
   CardContent,
   TextField,
   Button,
+  Link,
   Slider,
   Typography, Checkbox, FormControlLabel, FormGroup,
   Collapse,  Select, MenuItem,
 } from '@mui/material';
+import Modal from '@mui/material/Modal';
+
 import Web3 from "web3";
 import { ethers } from "ethers";
 import {approveInsuranceContract} from "../util/contract";
@@ -447,10 +450,36 @@ const useStyles = makeStyles((theme) => ({
    pageContainer: {
     marginTop: theme.spacing(4),
   },
+  modalStyle: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400, // or any suitable width
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(4),
+    outline: 'none',
+    borderRadius: theme.shape.borderRadius,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  viewPortfolioButton: {
+    marginTop: theme.spacing(2),
+    backgroundColor: '#6a1b9a', // A shade of purple
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#5c1798', // A slightly darker shade for hover
+    },
+  },
   
 }));
 
 function AddPoolPage() {
+  const [showSuccessModal, setShowSuccessModal] = useState(true);
+
   const provider = useProvider();
   const [stakingTokenAddress, setStakingTokenAddress] = useState("0xc0A7F1B0c9988FbC123f688a521387A51596da47");
 
@@ -612,15 +641,38 @@ const [selectedToken, setSelectedToken] = useState('');
       if (write) {
         const tx = await write();
         console.log('Transaction initiated:', tx);
+        setShowSuccessModal(true);
+
       } else {
         console.error('Contract write function is not available');
         setIsTransactionError(true);
+        console.log('dead', config)
       }
     } catch (error) {
       console.error('Error executing contract write:', error);
     }
   };
-
+  // Success Modal JSX
+  const successModal = (
+    <Modal
+      open={showSuccessModal}
+      onClose={() => setShowSuccessModal(false)}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box className={classes.modalStyle}>
+        <Typography id="modal-modal-title" variant="h6">
+          Congratulations!
+        </Typography>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          You have successfully got coverage.
+        </Typography>
+        <Link href="/portfolio"> <Button className={classes.viewPortfolioButton} >
+          View Portfolio
+        </Button> </Link>
+      </Box>
+    </Modal>
+  );
   const handleLocationSelect = (selectedLocation) => {
     setLocation(selectedLocation);
   
@@ -662,6 +714,7 @@ const approveInsuranceContract = new ethers.Contract(stakingTokenAddress, ERC20_
     <LocalizationProvider dateAdapter={AdapterDateFns}>
 
     <Box className={classes.pageContainer}>
+    {successModal}
       <Container maxWidth="md">
         <Card className={classes.card}>
           <CardContent>

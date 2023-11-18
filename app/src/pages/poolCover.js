@@ -199,15 +199,18 @@ const useStyles = makeStyles((theme) => ({
 
 function PoolPage() {
   const provider = useProvider(); 
-  const id = 0;
+
 const [policy, setPolicy] = React.useState(null);
 useEffect(() => {
-    getPolicyById(provider, id)
+  const queryParams = new URLSearchParams(window.location.search);
+  const policyId = queryParams.get('id');
+
+  if (policyId) {
+    getPolicyById(provider, policyId)
       .then(data => setPolicy(data))
       .catch(error => console.error("Error fetching data:", error));
-
-  
-}, [id, provider]);
+  }
+}, [provider]);
   const [modalOpen, setModalOpen] = React.useState(true);
 const risk = parseInt(policy?.probability);
   const locations = [
