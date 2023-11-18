@@ -18,7 +18,7 @@ import {
 import PerformanceChart from "components/PerformanceComponent";
 import { useBalance } from 'wagmi';
 import { useAccount, useProvider } from 'wagmi';
-import { getPoliciesForCreator, getPoliciesForInvestor } from 'components/policyViews';
+import { getPoliciesForCreator, getPoliciesForInvestor, getPoliciesRequestingUnicefFunding, getPoliciesWithUnicefFunding } from 'components/policyViews';
 
 function App() {
   const { address, isConnecting, isDisconnected } = useAccount()
@@ -36,6 +36,16 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "100vh",
     padding: theme.spacing(4),
     color: "white",
+  },
+  unicefBanner: {
+    backgroundColor: "#6a1b9a",
+    color: "white",
+    padding: theme.spacing(1),
+    textAlign: "center",
+    fontSize: "1.2rem",
+    borderRadius: theme.shape.borderRadius,
+    boxShadow: "0 0 10px #9c27b0",
+    marginBottom: theme.spacing(2),
   },
   card: {
     background: "rgba(25, 25, 25, 0.9)",
@@ -61,13 +71,59 @@ const useStyles = makeStyles((theme) => ({
 function PortfolioPage() {
   const classes = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
+  const [policiesRequestingFunding, setPoliciesRequestingFunding] = useState([]);
+  const [policiesWithFunding, setPoliciesWithFunding] = useState([]);
 
+  const [isUNICEFAccount, setIsUNICEFAccount] = useState(false);
   const { data, isError, isLoading } = useBalance({
     address: address,
   });
   const provider = useProvider(); // Assumed you have set up wagmi provider
   const [policies, setPolicies] = useState([]);
   const [investments, setInvestments] = useState([]);
+  useEffect(() => {
+    if (address === "0x82Cce31fD049B7CD23De3D1F201aeA09907b9c25") {
+      setIsUNICEFAccount(true);
+      getPoliciesRequestingUnicefFunding(provider)
+        .then(data => setPoliciesRequestingFunding(data))
+        .catch(error => console.error("Error fetching UNICEF policies:", error));
+    }
+  }, [address, provider]);
+
+
+  const unicefBanner = isUNICEFAccount && (
+    <div className={classes.unicefBanner}>
+      UNICEF Account
+    </div>
+  );
+
+  const policiesRequestingUNICEFTable = (
+    <TableContainer component={Paper}>
+      <Table aria-label="policies requesting UNICEF funding">
+        <TableHead>
+          <TableRow>
+            <TableCell>Policy ID</TableCell>
+            <TableCell>Pool Type</TableCell>
+            <TableCell align="right">Premium</TableCell>
+            <TableCell align="right">Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {policiesRequestingFunding.map((policy, index) => (
+            <TableRow key={index}>
+              <TableCell>{policy.policyId}</TableCell>
+              <TableCell>{policy.poolType}</TableCell>
+              <TableCell align="right">{policy.premium}</TableCell>
+              <TableCell align="right">
+                <Button variant="contained" color="primary" size="small">Approve</Button>
+                <Button variant="contained" color="secondary" size="small" style={{ marginLeft: 8 }}>Deny</Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 
   useEffect(() => {
     if (address) {
@@ -147,6 +203,8 @@ function PortfolioPage() {
   return (
     <Box className={classes.pageContainer}>
       <Container maxWidth="lg">
+      {unicefBanner}
+
         <Typography variant="h4" className={classes.title}>
           Portfolio Summary
         </Typography>
@@ -180,6 +238,16 @@ function PortfolioPage() {
         {/* ... */}
 
        
+
+        {/* Policies Requesting UNICEF Funding Section */}
+        {isUNICEFAccount && (
+          <>
+            <Typography variant="h5" className={classes.title} style={{ marginTop: "20px", marginBottom: "20px" }}>
+              Policies Requesting UNICEF Funding
+            </Typography>
+            {policiesRequestingFunding.length > 0 ? policiesRequestingUNICEFTable : <Typography>No policies found.</Typography>}
+          </>
+        )}
 
         {/* Transaction History Section */}
         <Typography variant="h5" className={classes.title} style={{ marginTop: "20px", marginBottom: "20px" }}>
