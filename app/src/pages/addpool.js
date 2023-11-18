@@ -14,7 +14,7 @@ import {
 import Web3 from "web3";
 import { ethers } from "ethers";
 import {approveInsuranceContract} from "../util/contract";
-import {useSigner} from "wagmi";
+import { useSigner, useProvider } from "wagmi";
 import { ERC20_abi } from "../util/contract";
 
 import mapboxgl from 'mapbox-gl';
@@ -23,9 +23,7 @@ import SelectLocationMap from 'components/MapSelect'
 import { DatePicker, LocalizationProvider, MobileDatePicker, DesktopDatePicker, CalendarPicker } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi';
-const provider = new ethers.providers.JsonRpcProvider(
-  "https://goerli.gateway.tenderly.co"
-);
+
 
 
 
@@ -452,6 +450,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function AddPoolPage() {
+  const provider = useProvider();
+
   const [stakingTokenAddress, setStakingTokenAddress] = useState("0xc0A7F1B0c9988FbC123f688a521387A51596da47");
 
   const {data: signer, isError, isLoading} = useSigner();
