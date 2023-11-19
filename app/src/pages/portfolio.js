@@ -151,7 +151,7 @@ function PortfolioPage() {
         .catch(error => console.error("Error fetching UNICEF policies:", error));
     }
   }, [address, provider]);
-  const approveInsuranceContract = new ethers.Contract('0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4', ERC20_abi, provider); 
+  const approveInsuranceContract = new ethers.Contract('0xA286353240EC0FaC61E3864d6C25f4c47115a070', ERC20_abi, provider); 
   const approveContract = approveInsuranceContract.connect(signer);
 
   const handleApprove = async (policyId, token, amount) => {

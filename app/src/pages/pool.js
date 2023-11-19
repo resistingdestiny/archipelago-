@@ -349,7 +349,7 @@ const generateLocationData = () => {
     longitude: policy.location?.longitude,
     title: `Policy ${policy.policyId}`, // Example title
     description: policy.description || 'No description available', // Example description
-    // Add any other relevant data here
+   
   }));
 };
 const locationData = generateLocationData();
@@ -477,32 +477,7 @@ const locationData = generateLocationData();
           </Typography>
         </Box>
         <Box mt={4}>
-  {/* Activity Table */}
-{/*   <TableContainer component={Paper} className={classes.table}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell>Description</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell component="th" scope="row">
-                    {row.date}
-                  </TableCell>
-                  <TableCell>{row.type}</TableCell>
-                  <TableCell align="right" className={getAmountStyle(row.type)}>
-            {row.amount}
-          </TableCell>                  <TableCell>{row.description}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer> */}
+ 
           <Typography variant="h5" className={classes.title} style={{ marginTop: "20px", marginBottom: "20px" }}>
           Policies Protected
         </Typography>

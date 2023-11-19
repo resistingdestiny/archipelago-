@@ -147,20 +147,19 @@ function AddPoolPage() {
   const [isTransactionError, setIsTransactionError] = useState(false); 
   const [formData, setFormData] = useState({
     limit: "100000",
-    region: "BenAss",
+    region: "turkey",
     longitude: "10",
     latitude: "10",
     radius: "10000",
     startPeriod: "1700305970",
     endPeriod: "1700306970",
     probability: "900",
-    poolType: "Flood",
+    poolType: "earthuake",
     requestFundFromUNICEF: false,
     premium: "100",
-    denomination: "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+    denomination: "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
     acceptedTokens: [
-      "0xf2B719136656BF21c2B2a255F586afa34102b71d",
-      "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+      "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
     ]
   });
  const [contractArgs, setContractArgs] = useState([]);
@@ -168,7 +167,7 @@ function AddPoolPage() {
   useEffect(() => {
     setContractArgs([
       ethers.BigNumber.from(formData._limit || "100000"),
-      formData._region || "BenAss",
+      formData._region || "global",
       [
         ethers.BigNumber.from(toIntegerLatLong(formData.longitude) || "10"),
         ethers.BigNumber.from(toIntegerLatLong(formData.latitude) || "10"),
@@ -182,10 +181,9 @@ function AddPoolPage() {
       formData._poolType,
       formData._requestFundFromUNICEF !== undefined ? formData._requestFundFromUNICEF : true,
       ethers.BigNumber.from(formData._premium || "100"),
-      formData._denomination || "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+      formData._denomination || "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
       formData._acceptedTokens || [
-        "0xf2B719136656BF21c2B2a255F586afa34102b71d",
-        "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+        "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
       ]
     ]);
   }, [formData]);
@@ -264,10 +262,9 @@ const [selectedToken, setSelectedToken] = useState('');
       formData.poolType,
       formData.requestFundFromUNICEF !== undefined ? formData.requestFundFromUNICEF : true,
       ethers.BigNumber.from(formData.premium || "100"),
-      formData.denomination || "0xf2B719136656BF21c2B2a255F586afa34102b71d",
+      formData.denomination || "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
       formData.acceptedTokens || [
-        "0xf2B719136656BF21c2B2a255F586afa34102b71d",
-        "0xf2B719136656BF21c2B2a255F586afa34102b71d"
+        "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
       ]
     ]);
                              
@@ -289,7 +286,27 @@ const [selectedToken, setSelectedToken] = useState('');
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     // Update contractArgs with the form data
-   
+    setContractArgs([
+      ethers.BigNumber.from(formData.limit),
+      formData.region ,
+      [
+        ethers.BigNumber.from(toIntegerLatLong(formData.longitude)),
+        ethers.BigNumber.from(toIntegerLatLong(formData.latitude)),
+        ethers.BigNumber.from(formData.radius )
+      ],
+      [
+        ethers.BigNumber.from(formData.startPeriod || "1700305970"),
+        ethers.BigNumber.from(formData.endPeriod || "1700306970")
+      ],
+      ethers.BigNumber.from(formData.probability || "900"),
+      formData.poolType,
+      formData.requestFundFromUNICEF !== undefined ? formData.requestFundFromUNICEF : true,
+      ethers.BigNumber.from(formData.premium || "100"),
+      formData.denomination || "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
+      formData.acceptedTokens || [
+        "0xA286353240EC0FaC61E3864d6C25f4c47115a070",
+      ]]);
+
     let gasAcceptPrice = await signer.getGasPrice();
 
     try {
