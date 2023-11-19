@@ -2,8 +2,8 @@ import { Chain } from 'wagmi'
  
 export const mantle = {
     id: 5001,
-    name: 'Mantle',
-    network: 'Mantle Testnet',
+    name: 'Mantle Testnet',
+    network: 'mantle',
     iconUrl: "https://pbs.twimg.com/profile_images/1597775748580134914/bLhE1aY1_400x400.jpg",
     nativeCurrency: {
       decimals: 18,
@@ -15,7 +15,7 @@ export const mantle = {
       default: { http: ['https://rpc.testnet.mantle.xyz'] },
     },
     blockExplorers: {
-      default: { name: 'SnowTrace', url: 'https://explorer.testnet.mantle.xyz' },
+      default: { name: 'mantlescan', url: 'https://explorer.testnet.mantle.xyz' },
     },
   }
 
