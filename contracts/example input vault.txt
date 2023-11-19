@@ -1,0 +1,18 @@
+
+function createVault
+underlyingAsset:
+0xA286353240EC0FaC61E3864d6C25f4c47115a070
+name:
+Global Flood Vault
+symbol:
+aGFV
+insurancePolicyContract:
+0xAc465398e4c8F9678adce49572Efcb77f26E95f9
+region:
+Global
+minPremiumRate:
+50
+denomination:
+0xA286353240EC0FaC61E3864d6C25f4c47115a070
+poolType:
+Flood

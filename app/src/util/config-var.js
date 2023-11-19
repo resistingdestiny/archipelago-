@@ -1,3 +1,277 @@
+export const tokenizedVaultFactoryAddress = "0xEd02702e173c0f45bf59eEf9E585d0Cf4b323bCb";
+export const tokenizedVaultFactoryAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "contract ERC20",
+				"name": "underlyingAsset",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			},
+			{
+				"internalType": "contract IInsurancePolicyContract",
+				"name": "insurancePolicyContract",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "region",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minPremiumRate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "denomination",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "poolType",
+				"type": "string"
+			}
+		],
+		"name": "createVault",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "vaultId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "vaultAddress",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "vaultAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "underlyingAsset",
+						"type": "address"
+					},
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "region",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minPremiumRate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "denomination",
+								"type": "address"
+							},
+							{
+								"internalType": "string",
+								"name": "poolType",
+								"type": "string"
+							}
+						],
+						"internalType": "struct TokenizedVault.InvestmentCriteria",
+						"name": "investmentCriteria",
+						"type": "tuple"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "symbol",
+						"type": "string"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct TokenizedVaultFactory.VaultParams",
+				"name": "params",
+				"type": "tuple"
+			}
+		],
+		"name": "VaultCreated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "vaultId",
+				"type": "uint256"
+			}
+		],
+		"name": "getVaultDetails",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "vaultAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "underlyingAsset",
+						"type": "address"
+					},
+					{
+						"components": [
+							{
+								"internalType": "string",
+								"name": "region",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minPremiumRate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "denomination",
+								"type": "address"
+							},
+							{
+								"internalType": "string",
+								"name": "poolType",
+								"type": "string"
+							}
+						],
+						"internalType": "struct TokenizedVault.InvestmentCriteria",
+						"name": "investmentCriteria",
+						"type": "tuple"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "symbol",
+						"type": "string"
+					}
+				],
+				"internalType": "struct TokenizedVaultFactory.VaultParams",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalVaults",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "vaults",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "vaultAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "underlyingAsset",
+				"type": "address"
+			},
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "region",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minPremiumRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "denomination",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "poolType",
+						"type": "string"
+					}
+				],
+				"internalType": "struct TokenizedVault.InvestmentCriteria",
+				"name": "investmentCriteria",
+				"type": "tuple"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+
 export const insurancePolicyAddress = "0xcF1a6099eeb2AB657b7dB39042782ed041E0CF3A";
 
 export const insurancePolicyABI = [
