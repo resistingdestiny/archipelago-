@@ -15,12 +15,31 @@ import {
   Paper,
   TableContainer,
   Button,
+  Modal
 } from "@mui/material";
 import PerformanceChart from "components/PerformanceComponent";
 import { useBalance } from 'wagmi';
 import { useAccount, useProvider } from 'wagmi';
 import { getPoliciesForCreator, getPoliciesForInvestor, getPoliciesRequestingUnicefFunding, getPoliciesWithUnicefFunding } from 'components/policyViews';
 import Link from '@mui/material/Link';
+import {
+  usePrepareContractWrite,
+  useContractWrite,
+  useWaitForTransaction,
+
+} from 'wagmi'
+
+import {insurancePolicyABI} from "../util/config-var";
+import { insurancePolicyAddress } from '../util/config-var';
+import { ERC20_abi } from "../util/contract";
+import { ethers } from "ethers";
+
+import { useSigner } from "wagmi";
+
+
+
+const contractAddress = insurancePolicyAddress;
+
 
 function App() {
   const { address, isConnecting, isDisconnected } = useAccount()
@@ -68,16 +87,57 @@ const useStyles = makeStyles((theme) => ({
   performanceSection: {
     marginTop: theme.spacing(3),
   },
+  modalStyle: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400, // or any suitable width
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(4),
+    outline: 'none',
+    borderRadius: theme.shape.borderRadius,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  viewPortfolioButton: {
+    marginTop: theme.spacing(2),
+    backgroundColor: '#6a1b9a', // A shade of purple
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#5c1798', // A slightly darker shade for hover
+    },
+  },
   // Add other styles as needed
 }));
 function PortfolioPage() {
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [contractArgs, setContractArgs] = useState([]);
+
+  const {data: signer, issignerError, issignerLoading} = useSigner();
+
+  const { config: unicefDepositConfig } = usePrepareContractWrite({
+    address: insurancePolicyAddress, // The contract address
+    abi: insurancePolicyABI, // The ABI of the contract
+    functionName: 'unicefDeposit', // The name of the function to call
+    args: contractArgs
+  });
+  const { data, error, isError, write } = useContractWrite(unicefDepositConfig)
+  
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  })
   const classes = useStyles();
   const { address, isConnecting, isDisconnected } = useAccount();
   const [policiesRequestingFunding, setPoliciesRequestingFunding] = useState([]);
   const [policiesWithFunding, setPoliciesWithFunding] = useState([]);
 
   const [isUNICEFAccount, setIsUNICEFAccount] = useState(false);
-  const { data, isError, isLoading } = useBalance({
+  const { balanceData, isBalanceError, isBalanceLoading } = useBalance({
     address: address,
   });
   const provider = useProvider(); // Assumed you have set up wagmi provider
@@ -91,14 +151,53 @@ function PortfolioPage() {
         .catch(error => console.error("Error fetching UNICEF policies:", error));
     }
   }, [address, provider]);
+  const approveInsuranceContract = new ethers.Contract('0xd5732321a56d5Eb76e86CEB9D91De950060C3Ba4', ERC20_abi, provider); 
+  const approveContract = approveInsuranceContract.connect(signer);
 
+  const handleApprove = async (policyId, token, amount) => {
+    let gasAcceptPrice = await signer.getGasPrice();
 
+    console.log('policyid', policyId, 'token', token, 'amount', amount)
+    try {
+      await approveContract.approve(contractAddress, ethers.BigNumber.from('10000000000000000'),  {
+        gasLimit: 300000,
+        gasPrice: gasAcceptPrice.mul(1),
+      });  
+      setContractArgs([policyId, token, ethers.BigNumber.from(amount)])
+      const tx = await write();
+      console.log('Transaction initiated:', tx);
+      setShowSuccessModal(true);
+
+    } catch (error) {
+      console.error('Error executing contract write:', error);
+    }
+  };
   const unicefBanner = isUNICEFAccount && (
     <div className={classes.unicefBanner}>
       UNICEF Account
     </div>
   );
-
+  // Success Modal JSX
+  const successModal = (
+    <Modal
+      open={showSuccessModal}
+      onClose={() => setShowSuccessModal(false)}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box className={classes.modalStyle}>
+        <Typography id="modal-modal-title" variant="h6">
+          Congratulations!
+        </Typography>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          You have successfully funded a policy.
+        </Typography>
+        <Link href="/portfolio"> <Button className={classes.viewPortfolioButton} >
+          View Portfolio
+        </Button> </Link>
+      </Box>
+    </Modal>
+  );
   const policiesRequestingUNICEFTable = (
     <TableContainer component={Paper}>
       <Table aria-label="policies requesting UNICEF funding">
@@ -108,6 +207,7 @@ function PortfolioPage() {
             <TableCell>Pool Type</TableCell>
             <TableCell align="right">Premium</TableCell>
             <TableCell align="right">Action</TableCell>
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -116,10 +216,17 @@ function PortfolioPage() {
               <TableCell>{policy.policyId}</TableCell>
               <TableCell>{policy.poolType}</TableCell>
               <TableCell align="right">{policy.premium}</TableCell>
+             
               <TableCell align="right">
-                <Button variant="contained" color="primary" size="small">Approve</Button>
+                <Button onClick={() => handleApprove(policy.policyId, insurancePolicyAddress, policy.premium)} variant="contained" color="primary" size="small">Approve</Button>
                 <Button variant="contained" color="secondary" size="small" style={{ marginLeft: 8 }}>Deny</Button>
               </TableCell>
+              <TableCell
+                align="right" >  <Link href={`/poolCover?id=${policy.policyId}`} color="inherit" underline="none">
+                <Button variant="contained" color="primary" size="small">
+                  View
+                </Button>
+              </Link></TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -214,6 +321,8 @@ function PortfolioPage() {
   return (
     <Box className={classes.pageContainer}>
       <Container maxWidth="lg">
+      {successModal}
+
       {unicefBanner}
 
         <Typography variant="h4" className={classes.title}>
@@ -228,9 +337,9 @@ function PortfolioPage() {
             <Card className={classes.card}>
               <CardContent>
                 <Typography variant="h6">Balances</Typography>
-                {isLoading ? <div>Fetching balance…</div> : null}
-                {isError ? <div>Error fetching balance</div> : null}
-                {data ? <Typography> {data.formatted} {data.symbol}</Typography> : null}
+                {isBalanceLoading ? <div>Fetching balance…</div> : null}
+                {isBalanceError ? <div>Error fetching balance</div> : null}
+                {balanceData ? <Typography> {data.formatted} {data.symbol}</Typography> : null}
                 
                 {isDisconnected ? (
                     <Button variant="contained" className={classes.button}>
