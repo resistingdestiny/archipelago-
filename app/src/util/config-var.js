@@ -1,3 +1,4 @@
+
 export const tokenizedVaultFactoryAddress = "0xEd02702e173c0f45bf59eEf9E585d0Cf4b323bCb";
 export const tokenizedVaultFactoryAbi = [
 	{
@@ -1847,6 +1848,153 @@ export const insurancePolicyABI = [
 		"name": "updateOracleValue",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
+
+
+export const vaultABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "policyId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "commitFunds",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "policyId",
+				"type": "uint256"
+			}
+		],
+		"name": "insurancePolicies",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "limit",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "region",
+						"type": "string"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "longitude",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "latitude",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "radius",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct IInsurancePolicyContract.Location",
+						"name": "location",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "start",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "end",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct IInsurancePolicyContract.Period",
+						"name": "coverPeriod",
+						"type": "tuple"
+					},
+					{
+						"internalType": "uint256",
+						"name": "probability",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "poolType",
+						"type": "string"
+					},
+					{
+						"internalType": "bool",
+						"name": "requestFundFromUNICEF",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "receivedFundFromUNICEF",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "premium",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "fundsCommitted",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "denomination",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "active",
+						"type": "bool"
+					},
+					{
+						"internalType": "address[]",
+						"name": "acceptedTokens",
+						"type": "address[]"
+					},
+					{
+						"internalType": "address",
+						"name": "creator",
+						"type": "address"
+					}
+				],
+				"internalType": "struct IInsurancePolicyContract.InsurancePolicy",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]
