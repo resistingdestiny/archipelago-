@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import {
   Select,
@@ -18,6 +18,11 @@ import {
   Avatar,
 } from '@mui/material';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import { getAllVaults } from 'components/vaultsView';
+import { useProvider } from "wagmi";
+
+
+
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -266,7 +271,18 @@ function DashboardPage(props) {
 
     setProducts(filtered); 
   };
+  const provider = useProvider();
 
+  const [vaults, setVaults] = useState ('')
+  console.log(vaults)
+  useEffect(() => {
+   
+      getAllVaults(provider)
+        .then(data => setVaults(data))
+        .catch(error => console.error("Error fetching policies:", error));
+  
+    
+  }, [provider]);
   return (
     <div className={classes.root}>
       <Container maxWidth="lg">
