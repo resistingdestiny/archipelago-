@@ -1,60 +1,6 @@
 
-export const tokenizedVaultFactoryAddress = "0xEd02702e173c0f45bf59eEf9E585d0Cf4b323bCb";
+export const tokenizedVaultFactoryAddress = "0xe5FAEC635BD8b313fB37283047537BEB9978AC15";
 export const tokenizedVaultFactoryAbi = [
-	{
-		"inputs": [
-			{
-				"internalType": "contract ERC20",
-				"name": "underlyingAsset",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "symbol",
-				"type": "string"
-			},
-			{
-				"internalType": "contract IInsurancePolicyContract",
-				"name": "insurancePolicyContract",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "region",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "minPremiumRate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "denomination",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "poolType",
-				"type": "string"
-			}
-		],
-		"name": "createVault",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
 	{
 		"anonymous": false,
 		"inputs": [
@@ -128,6 +74,60 @@ export const tokenizedVaultFactoryAbi = [
 		],
 		"name": "VaultCreated",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "contract ERC20",
+				"name": "underlyingAsset",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			},
+			{
+				"internalType": "contract IInsurancePolicyContract",
+				"name": "insurancePolicyContract",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "region",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minPremiumRate",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "denomination",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "poolType",
+				"type": "string"
+			}
+		],
+		"name": "createVault",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -272,8 +272,7 @@ export const tokenizedVaultFactoryAbi = [
 		"type": "function"
 	}
 ]
-
-export const insurancePolicyAddress = "0xcF1a6099eeb2AB657b7dB39042782ed041E0CF3A";
+export const insurancePolicyAddress = "0xb647C1907C71E7BB467943e1A1C50DB2C06D2af9";
 
 export const insurancePolicyABI = [
 	{
