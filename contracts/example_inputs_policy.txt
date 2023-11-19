@@ -54,3 +54,4 @@ Finish policy (supply id)
 {
 	"uint256 policyId": "0"
 }
+

@@ -251,6 +251,8 @@ function PortfolioPage() {
 
     }
   }, [address, provider]);
+console.log(unicefDepositConfig)
+
 
   const transactionHistoryTable = (
     <TableContainer component={Paper}>

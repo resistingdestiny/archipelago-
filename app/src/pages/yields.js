@@ -176,7 +176,8 @@ const createQueryString = (product) => {
   queryParams.append('capacity', product.capacity);
   queryParams.append('yield', product.yield);
   queryParams.append('utilization', product.utilization);
-  queryParams.append('policies', product.policies);
+  queryParams.append('address', product.vaultAddress);
+
   queryParams.append('poolType', product.poolType);
   queryParams.append('risk', product.risk);
   queryParams.append('description', product.description);
@@ -193,7 +194,8 @@ const allProducts = [
     yield: '18.60%',
     utilization: '20',
     poolType: 'tsunami',
-    policies: '7',
+    vaultAddress: "0xC62F0c7D0fcb9FC62D128906d405Aa86A4737300",
+    symbol: "aGTP",
     risk: 10, 
     description: 'Earn between 10-20% APY protecting the world from Tsunamis',
     tags: ['Natural Catastrophe', 'Water', 'Global'], 
@@ -206,8 +208,9 @@ const allProducts = [
     yield: '8%',
     utilization: '20',
     poolType: 'hurricane',
-    policies: '9',
     risk: 20,
+    symbol: "aGHP",
+    vaultAddress: "0x9e9ee7CE0125dE7Dca425Ed192336390fEee1b04",
     description: 'Earn between 5-10% APY protecting the world from Hurricanes',
     tags: ['Natural Catastrophe', 'Hurricanes', 'Global'], 
     image: 'images/hurricane.png'
@@ -219,8 +222,9 @@ const allProducts = [
     yield: '6%',
     utilization: '20',
     poolType: 'earthquake',
-    policies: '11',
     risk: 30,
+    symbol: "aTEP",
+    vaultAddress: "0xc53A060aa339992d3E5A69258211aa64F9B8891", 
     description: 'Earn between 5-10% APY protecting Turkey from Earthquakes',
     tags: ['Natural Catastrophe', 'Earthquake', 'Regional'], 
     image: 'images/earthquake.png'
@@ -287,19 +291,7 @@ function DashboardPage(props) {
     <div className={classes.root}>
       <Container maxWidth="lg">
       <Box className={classes.filterContainer}>
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel>Number of policies</InputLabel>
-          <Select
-            value={strategy}
-            onChange={(e) => setStrategy(e.target.value)}
-            label="Strategy"
-          >
-           
-            <MenuItem value="Strategy1">Highest</MenuItem>
-            <MenuItem value="Strategy2">Lowest</MenuItem>
-            {/* ... other strategies */}
-          </Select>
-        </FormControl>
+      
 
     
 
@@ -341,8 +333,8 @@ function DashboardPage(props) {
         <Typography className={classes.yield}>{product.yield} APR</Typography>
         <Typography className={classes.description}>{product.description}</Typography>
         <Box className={classes.progressContainer}>
-          <Typography>Policies:</Typography>
-          <Typography>{product.policies}</Typography>
+          <Typography>{product.symbol}</Typography>
+         
           <Typography>Risk:</Typography>
           <Typography>{product.risk}%</Typography>
         </Box>
