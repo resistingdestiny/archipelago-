@@ -11,19 +11,28 @@ interface IUniswapV2Router {
 
 //ITokenizedVault Interface
 interface ITokenizedVault {
-    // Struct definitions
+    // Data structure for investment criteria
     struct InvestmentCriteria {
         string region;
-        uint256 minPremiumRate;
+        uint256 minPremiumRate; // Represented as a percentage (e.g., 10% = 1000)
+        address denomination;
         string poolType;
     }
 
-    // Functions
+    // Function signatures
+    function updateInsurancePolicyContract(address newContract) external;
     function totalAssetsAvailable() external view returns (uint256);
-
-    function commitFunds(uint256 policyId, uint256 amount) external;
-
+    function totalAssets() external view returns (uint256);
+    function commitFunds(uint256 policyId, uint256 amount, address denomination) external;
     function releaseFunds(uint256 policyId, uint256 amount) external;
+    function updateInvestmentCriteria(string memory region, uint256 minPremiumRate, address denomination, string memory poolType) external;
+    function getInvestmentCriteria() external view returns (InvestmentCriteria memory);
+    function getRegionAndPoolType() external view returns (string memory, string memory);
+
+    // Events
+    event InvestmentCriteriaUpdated(string region, uint256 minPremiumRate, address denomination, string poolType);
+    event FundsCommitted(uint256 policyId, uint256 amount);
+    event FundsReleased(uint256 policyId, uint256 amount);
 }
 
 interface ITokenizedVaultFactory {
@@ -35,7 +44,12 @@ interface ITokenizedVaultFactory {
         string name;
         string symbol;
     }
-
+    struct InvestmentCriteria {
+        string region;
+        uint256 minPremiumRate; // Represented as a percentage (e.g., 10% = 1000)
+        address denomination;
+        string poolType;
+    }
     function getVaultDetails(uint256 vaultId)
         external
         view
@@ -141,17 +155,24 @@ contract InsurancePolicyContract {
         policy.acceptedTokens = _acceptedTokens;
         policy.creator = msg.sender;
 
-        //Request funding from pools
-        uint256 totalVaults = tokenizedVaultFactory.totalVaults(); // Assumes a public state variable in factory
-        for (uint256 i = 0; i < totalVaults; i++) {
-            address vaultAddress = tokenizedVaultFactory.vaults(i).vaultAddress;
-            ITokenizedVault vault = ITokenizedVault(vaultAddress);
-            try vault.commitFunds(nextPolicyId - 1, _limit) {
-                // Handle success
-            } catch {
-                // Handle failure or ignore
-            }
-        }
+    }
+
+
+    function commitFundsFromEligibleVaults(uint256 policyId, uint256 vaultId) external onlyCreator {
+        // Assume insurancePolicies is a mapping of policyId to InsurancePolicy
+        InsurancePolicy storage policy = insurancePolicies[policyId];
+
+        uint256 totalVaults = tokenizedVaultFactory.totalVaults();
+        ITokenizedVaultFactory.VaultParams memory vaultParams = tokenizedVaultFactory.getVaultDetails(vaultId);
+        ITokenizedVault vault = ITokenizedVault(vaultParams.vaultAddress);
+        // ITokenizedVault.InvestmentCriteria memory criteria = vault.InvestmentCriteria;
+
+        vault.commitFunds(policyId,policy.limit,policy.denomination);
+
+            // if (isCriteriaMet(policy, criteria)) {
+            //     // Assuming the policy's limit is the amount to commit
+            //     vault.commitFunds(policyId, policy.limit);
+            // }
     }
 
     function commitFunds(
@@ -288,6 +309,7 @@ contract InsurancePolicyContract {
             "Limit exceeded"
         );
 
+        policy.receivedFundFromUNICEF = true;
         policy.fundsCommitted += tokenValueInDenomination;
         if (policy.userFundsCommitted[msg.sender][token] == 0) {
             policy.usersCommitted.push(msg.sender); // Add user to the array if not already added

@@ -9,9 +9,7 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 
 pragma solidity ^0.8.0;
 
-
 interface IInsurancePolicyContract {
-
     struct Location {
         uint256 longitude;
         uint256 latitude;
@@ -40,19 +38,23 @@ interface IInsurancePolicyContract {
         address creator;
         // Other members as per the original struct definition
     }
+
     // Function to commit funds to an insurance policy
     function commitFunds(
         uint256 policyId,
         address token,
         uint256 amount
     ) external;
+
     // Mapping to access individual insurance policies
-    function insurancePolicies(uint256 policyId) external view returns (InsurancePolicy memory);
+    function insurancePolicies(uint256 policyId)
+        external
+        view
+        returns (InsurancePolicy memory);
 }
 
-
 contract TokenizedVault is ERC4626 {
-   ERC20 public immutable assetContract;
+    ERC20 public immutable assetContract;
 
     IInsurancePolicyContract public insurancePolicyContract;
     address public owner;
@@ -69,7 +71,12 @@ contract TokenizedVault is ERC4626 {
 
     // event Deposit(address indexed caller, address indexed owner, uint256 assets, uint256 shares);
     // event Withdraw(address indexed caller, address indexed receiver, address indexed owner, uint256 assets, uint256 shares);
-    event InvestmentCriteriaUpdated(string region, uint256 minPremiumRate, address denomination, string poolType);
+    event InvestmentCriteriaUpdated(
+        string region,
+        uint256 minPremiumRate,
+        address denomination,
+        string poolType
+    );
     event FundsCommitted(uint256 policyId, uint256 amount);
     event FundsReleased(uint256 indexed policyId, uint256 amount);
 
@@ -101,51 +108,86 @@ contract TokenizedVault is ERC4626 {
     }
 
     // Function to update the address of the insurance policy contract
-    function updateInsurancePolicyContract(IInsurancePolicyContract newContract) public onlyOwner {
+    function updateInsurancePolicyContract(IInsurancePolicyContract newContract)
+        public
+        onlyOwner
+    {
         require(address(newContract) != address(0), "Invalid address");
         insurancePolicyContract = newContract;
     }
 
-    function totalAssetsAvailable()  public view returns (uint256) {
+    function totalAssetsAvailable() public view returns (uint256) {
         // return 10 - totalCommittedFunds;
         return assetContract.balanceOf(address(this)) - totalCommittedFunds;
-    }    
+    }
+
     // Override the totalAssets function from ERC4626
     function totalAssets() public view override returns (uint256) {
-        // Implementation for totalAssets. 
+        // Implementation for totalAssets.
         // For example, this might return the balance of the underlying asset:
         return assetContract.balanceOf(address(this));
     }
-    // Function to commit funds to an insurance policy
-    function commitFunds(uint256 policyId, uint256 amount) public {
+
+// Function to get the region and poolType from investmentCriteria
+function getRegionAndPoolType() public view returns (string memory, string memory) {
+    return (investmentCriteria.region, investmentCriteria.poolType);
+}
+    function commitFunds(
+        uint256 policyId,
+        uint256 amount,
+        address denomination
+    ) public {
         require(msg.sender == address(insurancePolicyContract), "Unauthorized");
-        require(totalAssetsAvailable() >= amount, "Insufficient assets");
-
-        // Directly access the insurance policy data
-        IInsurancePolicyContract.InsurancePolicy memory policy = insurancePolicyContract.insurancePolicies(policyId);
-        require(policy.active, "Policy is not active");
-
-
-        // Check if investment criteria are met
-        require(keccak256(bytes(policy.region)) == keccak256(bytes(investmentCriteria.region)), "Region criteria not met");
-        require(policy.premium * 1000 / policy.limit >= investmentCriteria.minPremiumRate, "Minimum premium rate criteria not met");
-        require(keccak256(bytes(policy.poolType)) == keccak256(bytes(investmentCriteria.poolType)), "Pool type criteria not met");
-        require(investmentCriteria.denomination == policy.denomination, "Not correct denomination address");
-        
         
         // Call commitFunds on the insurancePolicyContract
-        insurancePolicyContract.commitFunds(policyId, investmentCriteria.denomination, amount);
-        // If the call is successful, update the totalCommittedFunds
-        totalCommittedFunds += amount;
-        
+        insurancePolicyContract.commitFunds(policyId, denomination, amount);
+
         // Approve the insurancePolicyContract to transfer the specified amount of the asset
         assetContract.approve(address(insurancePolicyContract), amount);
 
-        emit FundsCommitted(policyId, amount);
-    
         totalCommittedFunds += amount;
         emit FundsCommitted(policyId, amount);
     }
+
+    // function commitFunds(
+    //     uint256 policyId,
+    //     uint256 amount,
+    //     string memory region,
+    //     uint256 premium,
+    //     uint256 limit,
+    //     string memory poolType,
+    //     address denomination
+    // ) public {
+    //     require(msg.sender == address(insurancePolicyContract), "Unauthorized");
+    //     require(totalAssetsAvailable() >= amount, "Insufficient assets");
+    //     require(
+    //         keccak256(bytes(region)) ==
+    //             keccak256(bytes(investmentCriteria.region)),
+    //         "Region criteria not met"
+    //     );
+    //     require(
+    //         (premium * 1000) / limit >= investmentCriteria.minPremiumRate,
+    //         "Minimum premium rate criteria not met"
+    //     );
+    //     require(
+    //         keccak256(bytes(poolType)) ==
+    //             keccak256(bytes(investmentCriteria.poolType)),
+    //         "Pool type criteria not met"
+    //     );
+    //     require(
+    //         denomination == investmentCriteria.denomination,
+    //         "Not correct denomination address"
+    //     );
+
+    //     // Call commitFunds on the insurancePolicyContract
+    //     insurancePolicyContract.commitFunds(policyId, denomination, amount);
+
+    //     // Approve the insurancePolicyContract to transfer the specified amount of the asset
+    //     assetContract.approve(address(insurancePolicyContract), amount);
+
+    //     totalCommittedFunds += amount;
+    //     emit FundsCommitted(policyId, amount);
+    // }
 
     // Function to release committed funds for an insurance policy
     function releaseFunds(uint256 policyId, uint256 amount) public {
@@ -168,6 +210,11 @@ contract TokenizedVault is ERC4626 {
             denomination: _denomination,
             poolType: _poolType
         });
-        emit InvestmentCriteriaUpdated(_region, _minPremiumRate, _denomination, _poolType);
+        emit InvestmentCriteriaUpdated(
+            _region,
+            _minPremiumRate,
+            _denomination,
+            _poolType
+        );
     }
 }
