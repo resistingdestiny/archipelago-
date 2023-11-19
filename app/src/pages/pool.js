@@ -22,6 +22,7 @@ import {
   TableRow,
   Paper,
   Slider,
+  Modal,
 } from "@mui/material";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -35,9 +36,11 @@ import {
   useWaitForTransaction,
 
 } from 'wagmi'
+import { ERC20_abi } from "../util/contract";
 
 import {vaultABI} from "../util/config-var";
-import { vaultAddress } from '../util/config-var';
+
+
 
 import { ethers } from "ethers";
 
@@ -50,6 +53,30 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '100vh',
     padding: theme.spacing(4),
     color: 'white',
+  },
+  modalStyle: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400, // or any suitable width
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(4),
+    outline: 'none',
+    borderRadius: theme.shape.borderRadius,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  viewPortfolioButton: {
+    marginTop: theme.spacing(2),
+    backgroundColor: '#6a1b9a', // A shade of purple
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#5c1798', // A slightly darker shade for hover
+    },
   },
   mapContainer: {
     height: '400px', 
@@ -190,18 +217,28 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function PoolPage() {
+  const [vaultAddress, setVaultAddress] = useState('0xc53A060aa339992d3E5A69258211aa64F9B8891c');
+
+  const provider = useProvider(); 
+
+  const { address } = useAccount();
+  const [depositAmount, setDepositAmount] = useState(100);
+
  // Define state variables for each parameter
  const [showSuccessModal, setShowSuccessModal] = useState(false);
- const [contractArgs, setContractArgs] = useState([]);
  const {data: signer, issignerError, issignerLoading} = useSigner();
- const { config: depositeConfig } = usePrepareContractWrite({
+ const [contractArgs, setContractArgs] = useState([ethers.BigNumber.from(100), address]);
+ const approveInsuranceContract = new ethers.Contract('0xA286353240EC0FaC61E3864d6C25f4c47115a070', ERC20_abi, provider); 
+ const approveContract = approveInsuranceContract.connect(signer);
+ const { config: depositConfig } = usePrepareContractWrite({
   address: vaultAddress, // The contract address
   abi: vaultABI, // The ABI of the contract
   functionName: 'deposit', // The name of the function to call
   args: contractArgs
 });
-const { data, error, isError, write } = useContractWrite(depositeConfig)
-  
+
+const { data, error, isError, write } = useContractWrite(depositConfig)
+  console.log(depositConfig)
 const { isLoading, isSuccess } = useWaitForTransaction({
   hash: data?.hash,
 })
@@ -216,9 +253,7 @@ const { isLoading, isSuccess } = useWaitForTransaction({
  const [description, setDescription] = useState('');
  const [tags, setTags] = useState([]);
  const [image, setImage] = useState ('');
- const provider = useProvider(); 
- const [poolType, setPoolType] = useState('earthquake');
-
+ const [poolType, setPoolType] = useState('');
  
  useEffect(() => {
    // Parse the query string
@@ -228,12 +263,13 @@ const { isLoading, isSuccess } = useWaitForTransaction({
    setPoolCapacity(queryParams.get('capacity') || '');
    setPoolYield(queryParams.get('yield') || '');
    setUtilization(queryParams.get('utilization') || '');
-   setPolicies(queryParams.get('policies') || '');
    setRisk(parseInt(queryParams.get('risk'), 10) || 0);
    setDescription(queryParams.get('description') || '');
    setImage(queryParams.get('image') || '')
    setImage(queryParams.get('image') || '')
-
+    setPoolType(queryParams.get('poolType') || '')
+    setPoolType(queryParams.get('poolType') || '')
+    setVaultAddress(queryParams.get('address') || '')
    // Extract tags
    const extractedTags = [];
    queryParams.forEach((value, key) => {
@@ -252,16 +288,15 @@ const { isLoading, isSuccess } = useWaitForTransaction({
 }, [poolName]);
 
 console.log(policiesData);
-const handleInvest = async (policyId, token, amount) => {
+const handleInvest = async () => {
   let gasAcceptPrice = await signer.getGasPrice();
 
-  console.log('policyid', policyId, 'token', token, 'amount', amount)
   try {
     await approveContract.approve(vaultAddress, ethers.BigNumber.from('10000000000000000'),  {
       gasLimit: 300000,
       gasPrice: gasAcceptPrice.mul(1),
     });  
-    setContractArgs([policyId, token, ethers.BigNumber.from(amount)])
+    console.log('approved')
     const tx = await write();
     console.log('Transaction initiated:', tx);
     setShowSuccessModal(true);
@@ -270,6 +305,7 @@ const handleInvest = async (policyId, token, amount) => {
     console.error('Error executing contract write:', error);
   }
 };
+
 const transactionHistoryTable = (
   <TableContainer component={Paper}>
     <Table aria-label="transaction history">
@@ -307,37 +343,17 @@ const transactionHistoryTable = (
     </Table>
   </TableContainer>
 );
+const generateLocationData = () => {
+  return policiesData.map((policy) => ({
+    latitude: policy.location?.latitude,
+    longitude: policy.location?.longitude,
+    title: `Policy ${policy.policyId}`, // Example title
+    description: policy.description || 'No description available', // Example description
+    // Add any other relevant data here
+  }));
+};
+const locationData = generateLocationData();
 
-  const locations = [
-    {
-      title: 'Istanbul',
-      latitude: 41.0082,
-      longitude: 28.9784,
-      description: 'The historical and economic hub of Turkey.',
-      streetViewImageUrl: '/path-to-istanbul-street-view.jpg'
-    },
-    {
-      title: 'Ankara',
-      latitude: 39.9334,
-      longitude: 32.8597,
-      description: 'The capital city of Turkey, known for its government buildings and museums.',
-      streetViewImageUrl: '/path-to-ankara-street-view.jpg'
-    },
-    {
-      title: 'Cappadocia',
-      latitude: 38.6431,
-      longitude: 34.8289,
-      description: 'Famous for its unique geological formations and hot air balloon flights.',
-      streetViewImageUrl: '/path-to-cappadocia-street-view.jpg'
-    },
-    {
-      title: 'Ephesus',
-      latitude: 37.9398,
-      longitude: 27.3403,
-      description: 'An ancient Greek city with well-preserved ruins and a rich history.',
-      streetViewImageUrl: '/path-to-ephesus-street-view.jpg'
-    }
-  ];
 
   const rows = [
     { date: "2023-01-01", type: "Premium Earned", amount: "$500.00", description: "Monthly premium" },
@@ -345,30 +361,7 @@ const transactionHistoryTable = (
     // ... more rows
   ];
   
-  const policiesTable = (
-    <TableContainer component={Paper}>
-      <Table aria-label="policies table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Policy ID</TableCell>
-            <TableCell align="right">Details</TableCell>
-            {/* Add more columns as needed */}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {policiesData.map((policy, index) => (
-            <TableRow key={index}>
-              <TableCell component="th" scope="row">
-                {policy.id} {/* Adjust based on your policy object structure */}
-              </TableCell>
-              <TableCell align="right">{policy.details}</TableCell>
-              {/* Add more cells as needed */}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+
   const classes = useStyles();
   const [tabValue, setTabValue] = React.useState(0);
   const getAmountStyle = (type) => {
@@ -384,6 +377,26 @@ const transactionHistoryTable = (
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
+  const successModal = (
+    <Modal
+      open={showSuccessModal}
+      onClose={() => setShowSuccessModal(false)}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box className={classes.modalStyle}>
+        <Typography id="modal-modal-title" variant="h6">
+          Congratulations!
+        </Typography>
+        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+          You have successfully invested in a policy.
+        </Typography>
+        <Link href="/portfolio"> <Button className={classes.viewPortfolioButton} >
+          View Portfolio
+        </Button> </Link>
+      </Box>
+    </Modal>
+  );
   const handleCopyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
  
@@ -394,6 +407,8 @@ const transactionHistoryTable = (
   return (
     <Box className={classes.pageContainer}>
       <Container maxWidth="lg">
+      {successModal}
+
       {/* Vault Card */}
       <Card className={classes.card}>
       <CardContent>
@@ -494,19 +509,20 @@ const transactionHistoryTable = (
         {policiesData.length > 0 ? transactionHistoryTable : <Typography>No transactions found.</Typography>}
 
         </Box>
-        <Box className={classes.section}>
-          <Typography variant="h5" className={classes.title}>
-           Locations
-          </Typography>
-          <LinearProgress variant="determinate" value={50} />
-          <MapComponent locations={locations} />
-         
+        {locationData.length > 0 && (
+              <Box className={classes.section}>
+                <Typography variant="h5" className={classes.title}>
+                  Locations
+                </Typography>
+                <LinearProgress variant="determinate" value={50} />
+                <MapComponent locations={locationData} />
+              </Box>
+            )}
          
         <Box mt={4}>
 
 <PerformanceChart />
 </Box>
-        </Box>
         <Box>
 
 
@@ -530,16 +546,18 @@ const transactionHistoryTable = (
                     Deposit
                   </Typography>
                   <TextField
-                    fullWidth
-                    variant="outlined"
-                    label="Amount (SAVAX)"
-                    className={classes.input}
-                  />
-                  <Button variant="contained" color="primary" fullWidth>
-                    Connect Wallet
+  fullWidth
+  variant="outlined"
+  label="Amount"
+  className={classes.input}
+  value={depositAmount}
+  onChange={(e) => setDepositAmount(e.target.value)}
+/>
+                  <Button variant="contained" onClick={handleInvest} color="primary" fullWidth>
+                    Deposit
                   </Button>
                   <Typography variant="body2" color="textSecondary">
-                    Your deposit will be deployed in the vault's weekly strategy on Friday at 11am UTC
+                    Your wallet will be deployed to this vault 
                   </Typography>
                 </CardContent>
               )}
@@ -551,7 +569,7 @@ const transactionHistoryTable = (
                 <TextField
                   fullWidth
                   variant="outlined"
-                  label="Amount (SAVAX)"
+                  label="Amount "
                   className={classes.input}
                 />
                 <Button
@@ -560,7 +578,7 @@ const transactionHistoryTable = (
                   fullWidth
                   onClick={() => handleWithdraw(/* pass withdrawal amount here */)}
                 >
-                  Disconnect Wallet
+                  Withdraw
                 </Button>
                 <Typography variant="body2" color="textSecondary" >
                   Withdrawals are processed instantly. A withdrawal fee may apply.
@@ -571,14 +589,14 @@ const transactionHistoryTable = (
   <Box display="flex" justifyContent="center" alignItems="center" className={classes.section}>
     <Chip
       
-      label="Contract:  0x6BF...9FB3"
+      label={`Vault Address: ${vaultAddress}`}
       variant="outlined"
       onClick={() => handleCopyToClipboard('0x6BF...9FB3')}
       className={classes.contractChip}
     />
   </Box>
 
-  {policiesTable}
+  {/* {policiesTable} */}
 
           </Grid>
         </Grid>

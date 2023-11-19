@@ -223,7 +223,6 @@ const risk = parseInt(policy?.probability);
   
   ];
 
-  console.log(policy)
 
   const rows = [
     {      
