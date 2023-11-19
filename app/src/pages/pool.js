@@ -29,6 +29,19 @@ import MapComponent from 'components/MapComponent'
 import PerformanceChart from "components/PerformanceComponent";
 import { getPoliciesByType } from 'components/policyViews';
 import { useAccount, useProvider } from 'wagmi';
+import {
+  usePrepareContractWrite,
+  useContractWrite,
+  useWaitForTransaction,
+
+} from 'wagmi'
+
+import {vaultABI} from "../util/config-var";
+import { vaultAddress } from '../util/config-var';
+
+import { ethers } from "ethers";
+
+import { useSigner } from "wagmi";
 
 const useStyles = makeStyles((theme) => ({
   // Add all your styles here
@@ -178,6 +191,20 @@ const useStyles = makeStyles((theme) => ({
 
 function PoolPage() {
  // Define state variables for each parameter
+ const [showSuccessModal, setShowSuccessModal] = useState(false);
+ const [contractArgs, setContractArgs] = useState([]);
+ const {data: signer, issignerError, issignerLoading} = useSigner();
+ const { config: depositeConfig } = usePrepareContractWrite({
+  address: vaultAddress, // The contract address
+  abi: vaultABI, // The ABI of the contract
+  functionName: 'deposit', // The name of the function to call
+  args: contractArgs
+});
+const { data, error, isError, write } = useContractWrite(depositeConfig)
+  
+const { isLoading, isSuccess } = useWaitForTransaction({
+  hash: data?.hash,
+})
  const [policiesData, setPoliciesData] = useState([]); 
  const [poolName, setPoolName] = useState('');
  const [poolBalance, setPoolBalance] = useState('');
@@ -225,7 +252,24 @@ function PoolPage() {
 }, [poolName]);
 
 console.log(policiesData);
+const handleInvest = async (policyId, token, amount) => {
+  let gasAcceptPrice = await signer.getGasPrice();
 
+  console.log('policyid', policyId, 'token', token, 'amount', amount)
+  try {
+    await approveContract.approve(vaultAddress, ethers.BigNumber.from('10000000000000000'),  {
+      gasLimit: 300000,
+      gasPrice: gasAcceptPrice.mul(1),
+    });  
+    setContractArgs([policyId, token, ethers.BigNumber.from(amount)])
+    const tx = await write();
+    console.log('Transaction initiated:', tx);
+    setShowSuccessModal(true);
+
+  } catch (error) {
+    console.error('Error executing contract write:', error);
+  }
+};
 const transactionHistoryTable = (
   <TableContainer component={Paper}>
     <Table aria-label="transaction history">
