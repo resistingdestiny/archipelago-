@@ -9,6 +9,44 @@ interface IUniswapV2Router {
         returns (uint256[] memory amounts);
 }
 
+//ITokenizedVault Interface
+interface ITokenizedVault {
+    // Struct definitions
+    struct InvestmentCriteria {
+        string region;
+        uint256 minPremiumRate;
+        string poolType;
+    }
+
+    // Functions
+    function totalAssetsAvailable() external view returns (uint256);
+
+    function commitFunds(uint256 policyId, uint256 amount) external;
+
+    function releaseFunds(uint256 policyId, uint256 amount) external;
+}
+
+interface ITokenizedVaultFactory {
+    // Struct to hold vault creation parameters
+    struct VaultParams {
+        address vaultAddress;
+        address underlyingAsset;
+        ITokenizedVault.InvestmentCriteria investmentCriteria;
+        string name;
+        string symbol;
+    }
+
+    function getVaultDetails(uint256 vaultId)
+        external
+        view
+        returns (VaultParams memory);
+
+    // Public state variable accessor functions
+    function vaults(uint256 vaultId) external view returns (VaultParams memory);
+
+    function totalVaults() external view returns (uint256);
+}
+
 contract InsurancePolicyContract {
     struct Location {
         uint256 longitude;
@@ -41,6 +79,8 @@ contract InsurancePolicyContract {
         mapping(address => uint256) userFundsCommittedDenominated; // User -> Total Amount in Denominated Currency
     }
 
+    ITokenizedVaultFactory public tokenizedVaultFactory;
+
     address public unicefWallet; // Address for UNICEF's wallet
     address public contractCreator; // Address of the contract creator
 
@@ -58,6 +98,15 @@ contract InsurancePolicyContract {
     modifier onlyCreator() {
         require(msg.sender == contractCreator, "Caller is not the creator");
         _;
+    }
+
+    // Function to set the TokenizedVaultFactory address
+    function setTokenizedVaultFactoryAddress(address _factoryAddress)
+        public
+        onlyCreator
+    {
+        require(_factoryAddress != address(0), "Invalid factory address");
+        tokenizedVaultFactory = ITokenizedVaultFactory(_factoryAddress);
     }
 
     function createInsurancePolicy(
@@ -91,6 +140,18 @@ contract InsurancePolicyContract {
         policy.denomination = _denomination;
         policy.acceptedTokens = _acceptedTokens;
         policy.creator = msg.sender;
+
+        //Request funding from pools
+        uint256 totalVaults = tokenizedVaultFactory.totalVaults(); // Assumes a public state variable in factory
+        for (uint256 i = 0; i < totalVaults; i++) {
+            address vaultAddress = tokenizedVaultFactory.vaults(i).vaultAddress;
+            ITokenizedVault vault = ITokenizedVault(vaultAddress);
+            try vault.commitFunds(nextPolicyId - 1, _limit) {
+                // Handle success
+            } catch {
+                // Handle failure or ignore
+            }
+        }
     }
 
     function commitFunds(
@@ -134,6 +195,17 @@ contract InsurancePolicyContract {
         } else {
             payoutPremium(policyId);
             policy.active = false;
+        }
+
+        uint256 totalVaults = tokenizedVaultFactory.totalVaults(); // Assumes a public state variable in factory
+        for (uint256 i = 0; i < totalVaults; i++) {
+            address vaultAddress = tokenizedVaultFactory.vaults(i).vaultAddress;
+            ITokenizedVault vault = ITokenizedVault(vaultAddress);
+            try vault.releaseFunds(policyId, policy.limit) {
+                // Handle success
+            } catch {
+                // Handle failure or ignore
+            }
         }
     }
 
@@ -312,7 +384,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].requestFundFromUNICEF) {
-                policies[index++] = _convertToView(insurancePolicies[i],i);
+                policies[index++] = _convertToView(insurancePolicies[i], i);
             }
         }
         return policies;
@@ -336,7 +408,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].receivedFundFromUNICEF) {
-                policies[index++] = _convertToView(insurancePolicies[i],i);
+                policies[index++] = _convertToView(insurancePolicies[i], i);
             }
         }
         return policies;
@@ -351,7 +423,7 @@ contract InsurancePolicyContract {
             nextPolicyId
         );
         for (uint256 i = 0; i < nextPolicyId; i++) {
-            policies[i] = _convertToView(insurancePolicies[i],i);
+            policies[i] = _convertToView(insurancePolicies[i], i);
         }
         return policies;
     }
@@ -375,7 +447,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].active) {
-                livePolicies[index++] = _convertToView(insurancePolicies[i],i);
+                livePolicies[index++] = _convertToView(insurancePolicies[i], i);
             }
         }
         return livePolicies;
@@ -400,7 +472,8 @@ contract InsurancePolicyContract {
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (!insurancePolicies[i].active) {
                 finishedPolicies[index++] = _convertToView(
-                    insurancePolicies[i],i
+                    insurancePolicies[i],
+                    i
                 );
             }
         }
@@ -426,7 +499,7 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].userFundsCommittedDenominated[user] > 0) {
-                userPolicies[index++] = _convertToView(insurancePolicies[i],i);
+                userPolicies[index++] = _convertToView(insurancePolicies[i], i);
             }
         }
         return userPolicies;
@@ -450,7 +523,10 @@ contract InsurancePolicyContract {
         uint256 index = 0;
         for (uint256 i = 0; i < nextPolicyId; i++) {
             if (insurancePolicies[i].creator == creator) {
-                creatorPolicies[index++] = _convertToView(insurancePolicies[i],i);
+                creatorPolicies[index++] = _convertToView(
+                    insurancePolicies[i],
+                    i
+                );
             }
         }
         return creatorPolicies;
@@ -481,7 +557,10 @@ contract InsurancePolicyContract {
                 keccak256(bytes(insurancePolicies[i].region)) ==
                 keccak256(bytes(region))
             ) {
-                regionPolicies[index++] = _convertToView(insurancePolicies[i],i);
+                regionPolicies[index++] = _convertToView(
+                    insurancePolicies[i],
+                    i
+                );
             }
         }
         return regionPolicies;
@@ -512,11 +591,12 @@ contract InsurancePolicyContract {
                 keccak256(bytes(insurancePolicies[i].poolType)) ==
                 keccak256(bytes(poolType))
             ) {
-                poolPolicies[index++] = _convertToView(insurancePolicies[i],i);
+                poolPolicies[index++] = _convertToView(insurancePolicies[i], i);
             }
         }
         return poolPolicies;
     }
+
     // Struct to hold committed amounts in individual tokens
     struct CommittedAmounts {
         address token;
