@@ -18,7 +18,7 @@ const tokens = {
         "ARB": "0x7cc1d0980c8d0e248e4f94cf3714f890dc4f084c",
       },
       "linea": {
-        "WETH": "0x2c1b868d6596a18e32e61b901e4060c872647b6c",
+        "WETH": "0x2C1b868d6596a18e32E61B901E4060C872647b6C",
       },
       "base": {
         "WETH": "0x44d627f900da8adac7561bd73aa745f132450798"
